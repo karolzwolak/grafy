@@ -107,3 +107,93 @@ void Graph::swap_vertex(int i, int j) {
   sorted_vertex_arr[i] = sorted_vertex_arr[j];
   sorted_vertex_arr[j] = tmp;
 }
+
+int Graph::dfs_with_max_dist(int start_v, int *component_elems,
+                             int &component_len_out, int *stack, bool *visited,
+                             int *dist_start) {
+  int max_dist = 0;
+  int max_dist_v = start_v;
+
+  component_len_out = 0;
+
+  dist_start[start_v] = 0;
+  visited[start_v] = true;
+  int stack_len = 0;
+  stack[stack_len++] = start_v;
+
+  while (stack_len > 0) {
+    int v = stack[--stack_len];
+
+    for (int i = 0; i < vertex_adj_arr[v].len; i++) {
+      int u = vertex_adj_arr[v].adj[i];
+      if (visited[u]) {
+        continue;
+      }
+      visited[u] = true;
+      stack[stack_len++] = u;
+
+      component_elems[component_len_out++] = u;
+
+      dist_start[u] = dist_start[v] + 1;
+      if (dist_start[u] > max_dist) {
+        max_dist = dist_start[u];
+        max_dist_v = u;
+      }
+    }
+  }
+  return max_dist_v;
+}
+
+void Graph::single_component_vertices_eccentricity(
+    int start_v, int *eccentrity_out, int *component_elems, int *stack,
+    bool *visited_start, bool *visited_u, bool *visited_v, int *dist_start,
+    int *dist_u, int *dist_v) {
+
+  int component_len = 0;
+  int u = dfs_with_max_dist(start_v, component_elems, component_len, stack,
+                            visited_start, dist_start);
+  int v = dfs_with_max_dist(u, component_elems, component_len, stack, visited_u,
+                            dist_u);
+  dfs_with_max_dist(v, component_elems, component_len, stack, visited_v,
+                    dist_v);
+
+  for (int i = 0; i < component_len; i++) {
+    int w = component_elems[i];
+    int u_dist = dist_u[w];
+    int v_dist = dist_v[w];
+    eccentrity_out[w] = u_dist >= v_dist ? u_dist : v_dist;
+  }
+}
+
+int Graph::vertices_eccentricity_and_n_components(int *eccentricity_out) {
+  int n_components = 0;
+  int *stack = new int[len];
+  int *component_elems = new int[len];
+
+  bool *visited_start = new bool[len];
+  bool *visited_u = new bool[len];
+  bool *visited_v = new bool[len];
+  int *dist_start = new int[len];
+  int *dist_u = new int[len];
+  int *dist_v = new int[len];
+
+  for (int i = 0; i < len; i++) {
+    if (visited_start[i]) {
+      continue;
+    }
+    n_components++;
+    single_component_vertices_eccentricity(
+        i, eccentricity_out, component_elems, stack, visited_start, visited_u,
+        visited_v, dist_start, dist_u, dist_v);
+  }
+  delete[] stack;
+  delete[] component_elems;
+  delete[] visited_start;
+  delete[] visited_u;
+  delete[] visited_v;
+  delete[] dist_start;
+  delete[] dist_u;
+  delete[] dist_v;
+
+  return n_components;
+}
