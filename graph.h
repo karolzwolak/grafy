@@ -1,6 +1,10 @@
 #pragma once
 
+#include "queue.h"
 #include <random>
+
+int max(int, int);
+int min(int, int);
 
 struct VertexAdj {
   int len, cap;
@@ -34,14 +38,12 @@ struct Graph {
   int choose_pivot(int, int);
   void swap_vertex(int, int);
 
-  int dfs_with_max_dist(int start_v, int *component_elems,
-                        int &component_len_out, int *stack, bool *visited,
-                        int *dist_start);
+  int bfs_with_max_dist(int start_v, int *component_elems,
+                        int &component_len_out, Queue &queue, int *dist_start);
+
   void single_component_vertices_eccentricity(int start_v, int *eccentrity_out,
-                                              int *component_elems, int *stack,
-                                              bool *visited_start,
-                                              bool *visited_u, bool *visited_v,
-                                              int *dist_start, int *dist_u,
-                                              int *dist_v);
+                                              int *component_elems,
+                                              Queue &queue, int *dist_start,
+                                              int *dist_u, int *dist_v);
   int vertices_eccentricity_and_n_components(int *eccentricity_out);
 };

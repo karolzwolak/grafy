@@ -20,6 +20,7 @@ void parse_graph(Graph &graph_out) {
 }
 
 void print_graph(const Graph &graph) {
+  std::cout << "Graph:\n";
   for (int i = 0; i < graph.len; i++) {
     std::cout << i << ": ";
     for (int j = 0; j < graph.vertex_adj_arr[i].len; j++) {
@@ -39,10 +40,33 @@ void solve_degree_sequence(Graph &graph) {
 }
 
 void solve_graph(Graph &graph) {
+  // 1
   solve_degree_sequence(graph);
-  for (int i = 0; i < 9; i++) {
-    std::cout << "?\n";
+
+  int *eccentrities = new int[graph.len];
+  // 2
+  int n_components = graph.vertices_eccentricity_and_n_components(eccentrities);
+  std::cout << n_components << "\n";
+
+  // 3
+  std::cout << "?\n";
+  // 4
+  for (int i = 0; i < graph.len; i++) {
+    std::cout << eccentrities[i] << " ";
   }
+  std::cout << "\n";
+  // 5
+  std::cout << "?\n";
+  // 6
+  std::cout << "?\n";
+  // 7
+  std::cout << "?\n";
+  // 8
+  std::cout << "?\n";
+  // 9
+  std::cout << "?\n";
+  // 10
+  std::cout << "?\n";
 }
 
 int main() {

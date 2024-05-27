@@ -1,5 +1,9 @@
 #include "graph.h"
+#include "queue.h"
 #include <random>
+
+int min(int a, int b) { return a < b ? a : b; }
+int max(int a, int b) { return a > b ? a : b; }
 
 VertexAdj::VertexAdj() : len(0), cap(0), adj(nullptr) {}
 
@@ -108,33 +112,32 @@ void Graph::swap_vertex(int i, int j) {
   sorted_vertex_arr[j] = tmp;
 }
 
-int Graph::dfs_with_max_dist(int start_v, int *component_elems,
-                             int &component_len_out, int *stack, bool *visited,
+int Graph::bfs_with_max_dist(int start_v, int *component_elems,
+                             int &component_len_out, Queue &queue,
                              int *dist_start) {
   int max_dist = 0;
   int max_dist_v = start_v;
 
-  component_len_out = 0;
+  component_elems[0] = start_v;
+  component_len_out = 1;
 
   dist_start[start_v] = 0;
-  visited[start_v] = true;
-  int stack_len = 0;
-  stack[stack_len++] = start_v;
+  queue.add(start_v);
 
-  while (stack_len > 0) {
-    int v = stack[--stack_len];
+  while (queue.len > 0) {
+    int v = queue.remove();
 
+    int next_dist = dist_start[v] + 1;
     for (int i = 0; i < vertex_adj_arr[v].len; i++) {
       int u = vertex_adj_arr[v].adj[i];
-      if (visited[u]) {
+      if (dist_start[u] != -1) {
         continue;
       }
-      visited[u] = true;
-      stack[stack_len++] = u;
-
+      queue.add(u);
       component_elems[component_len_out++] = u;
 
-      dist_start[u] = dist_start[v] + 1;
+      dist_start[u] = next_dist;
+
       if (dist_start[u] > max_dist) {
         max_dist = dist_start[u];
         max_dist_v = u;
@@ -145,52 +148,47 @@ int Graph::dfs_with_max_dist(int start_v, int *component_elems,
 }
 
 void Graph::single_component_vertices_eccentricity(
-    int start_v, int *eccentrity_out, int *component_elems, int *stack,
-    bool *visited_start, bool *visited_u, bool *visited_v, int *dist_start,
-    int *dist_u, int *dist_v) {
+    int start_v, int *eccentrity_out, int *component_elems, Queue &queue,
+    int *dist_start, int *dist_u, int *dist_v) {
 
   int component_len = 0;
-  int u = dfs_with_max_dist(start_v, component_elems, component_len, stack,
-                            visited_start, dist_start);
-  int v = dfs_with_max_dist(u, component_elems, component_len, stack, visited_u,
-                            dist_u);
-  dfs_with_max_dist(v, component_elems, component_len, stack, visited_v,
-                    dist_v);
+  int u = bfs_with_max_dist(start_v, component_elems, component_len, queue,
+                            dist_start);
+  int v = bfs_with_max_dist(u, component_elems, component_len, queue, dist_u);
+  bfs_with_max_dist(v, component_elems, component_len, queue, dist_v);
 
   for (int i = 0; i < component_len; i++) {
     int w = component_elems[i];
     int u_dist = dist_u[w];
     int v_dist = dist_v[w];
-    eccentrity_out[w] = u_dist >= v_dist ? u_dist : v_dist;
+    eccentrity_out[w] = max(u_dist, v_dist);
   }
 }
 
 int Graph::vertices_eccentricity_and_n_components(int *eccentricity_out) {
   int n_components = 0;
-  int *stack = new int[len];
+  Queue queue;
+  queue.resize_clear(len);
   int *component_elems = new int[len];
 
-  bool *visited_start = new bool[len];
-  bool *visited_u = new bool[len];
-  bool *visited_v = new bool[len];
   int *dist_start = new int[len];
   int *dist_u = new int[len];
   int *dist_v = new int[len];
+  for (int i = 0; i < len; i++) {
+    dist_start[i] = -1;
+    dist_u[i] = -1;
+    dist_v[i] = -1;
+  }
 
   for (int i = 0; i < len; i++) {
-    if (visited_start[i]) {
+    if (dist_start[i] != -1) {
       continue;
     }
     n_components++;
-    single_component_vertices_eccentricity(
-        i, eccentricity_out, component_elems, stack, visited_start, visited_u,
-        visited_v, dist_start, dist_u, dist_v);
+    single_component_vertices_eccentricity(i, eccentricity_out, component_elems,
+                                           queue, dist_start, dist_u, dist_v);
   }
-  delete[] stack;
   delete[] component_elems;
-  delete[] visited_start;
-  delete[] visited_u;
-  delete[] visited_v;
   delete[] dist_start;
   delete[] dist_u;
   delete[] dist_v;
