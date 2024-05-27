@@ -32,6 +32,9 @@ void print_graph(const Graph &graph) {
 // void solve_graph(Graph &graph) {}
 
 int main() {
+  std::ios_base::sync_with_stdio(false);
+  std::cin.tie(nullptr);
+
   int test_cases;
   std::cin >> test_cases;
 
