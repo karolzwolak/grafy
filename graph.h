@@ -1,18 +1,18 @@
 #pragma once
 
 struct VertexAdj {
-  int len;
+  int len, cap;
   int *adj;
 
   VertexAdj();
 
-  void resize(int);
+  void resize_clear(int);
 };
 
 struct Graph {
-  int vertex_len;
+  int len, cap;
   VertexAdj *vertex_adj_arr;
 
   Graph();
-  void resize(int);
+  void resize_clear(int);
 };
