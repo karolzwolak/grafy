@@ -25,18 +25,19 @@ void print_graph(const Graph &graph) {
     for (int j = 0; j < graph.vertex_adj_arr[i].len; j++) {
       std::cout << graph.vertex_adj_arr[i].adj[j] << " ";
     }
-    std::cout << std::endl;
+    std::cout << "\n";
   }
 }
 
-void solve_degree_sequence(const Graph &graph) {
-  int *degree_sequence = new int[graph.len];
+void solve_degree_sequence(Graph &graph) {
+  graph.sort_vertex_by_degree_descending();
   for (int i = 0; i < graph.len; i++) {
-    degree_sequence[i] = graph.vertex_adj_arr[i].len;
+    std::cout << graph.vertex_adj_arr[i].len << " ";
   }
+  std::cout << "\n";
 }
 
-void solve_graph(Graph &graph) {}
+void solve_graph(Graph &graph) { solve_degree_sequence(graph); }
 
 int main() {
   std::ios_base::sync_with_stdio(false);
@@ -48,8 +49,8 @@ int main() {
   Graph graph;
   for (int i = 0; i < test_cases; i++) {
     parse_graph(graph);
-    print_graph(graph);
-    // solve_graph(graph);
+    // print_graph(graph);
+    solve_graph(graph);
   }
   return 0;
 }
