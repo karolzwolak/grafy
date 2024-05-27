@@ -32,12 +32,18 @@ void print_graph(const Graph &graph) {
 void solve_degree_sequence(Graph &graph) {
   graph.sort_vertex_by_degree_descending();
   for (int i = 0; i < graph.len; i++) {
-    std::cout << graph.vertex_adj_arr[i].len << " ";
+    int vertex = graph.sorted_vertex_arr[i];
+    std::cout << graph.vertex_adj_arr[vertex].len << " ";
   }
   std::cout << "\n";
 }
 
-void solve_graph(Graph &graph) { solve_degree_sequence(graph); }
+void solve_graph(Graph &graph) {
+  solve_degree_sequence(graph);
+  for (int i = 0; i < 9; i++) {
+    std::cout << "?\n";
+  }
+}
 
 int main() {
   std::ios_base::sync_with_stdio(false);

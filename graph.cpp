@@ -68,7 +68,7 @@ void Graph::quicksort_by_degree(int left, int right) {
   int pivot = partition_by_degree(left, right);
 
   quicksort_by_degree(left, pivot - 1);
-  quicksort_by_degree(pivot + 1, pivot);
+  quicksort_by_degree(pivot + 1, right);
 }
 
 bool Graph::vertex_prior_other(int u_i, int v_i) {
@@ -88,7 +88,7 @@ int Graph::partition_by_degree(int left, int right) {
 
   int i = left;
   for (int j = left; j < right; j++) {
-    if (vertex_prior_other(i, pivot)) {
+    if (vertex_prior_other(j, pivot)) {
       swap_vertex(i, j);
       i++;
     }
@@ -97,7 +97,7 @@ int Graph::partition_by_degree(int left, int right) {
   return i;
 }
 
-int Graph::choose_pivot(int left, int right) {
+int Graph::choose_pivot([[maybe_unused]] int left, int right) {
   auto dis = std::uniform_int_distribution<int>(left, right);
   return dis(gen);
 }
