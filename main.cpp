@@ -29,7 +29,14 @@ void print_graph(const Graph &graph) {
   }
 }
 
-// void solve_graph(Graph &graph) {}
+void solve_degree_sequence(const Graph &graph) {
+  int *degree_sequence = new int[graph.len];
+  for (int i = 0; i < graph.len; i++) {
+    degree_sequence[i] = graph.vertex_adj_arr[i].len;
+  }
+}
+
+void solve_graph(Graph &graph) {}
 
 int main() {
   std::ios_base::sync_with_stdio(false);
