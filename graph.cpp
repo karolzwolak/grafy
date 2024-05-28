@@ -25,26 +25,43 @@ Graph::Graph()
       sorted_vertex_arr(nullptr), is_sorted(false), queue(Queue()) {
   srand(time(NULL));
 }
-
-void Graph::resize_clear(int new_cap) {
-  is_sorted = false;
+void Graph::resize(int new_cap) {
   len = new_cap;
   queue.resize_clear(new_cap);
   if (new_cap <= cap) {
     return;
   }
+  int old_cap = cap;
   cap = new_cap;
+  VertexAdj *new_vertex_adj_arr = new VertexAdj[cap];
+
   if (vertex_adj_arr != nullptr) {
+    for (int i = 0; i < old_cap; i++) {
+      new_vertex_adj_arr[i] = vertex_adj_arr[i];
+    }
+    for (int i = old_cap; i < cap; i++) {
+      new_vertex_adj_arr[i] = VertexAdj();
+    }
     delete[] vertex_adj_arr;
+    delete[] _v_adj_order_sum_arr;
+    delete[] sorted_vertex_arr;
   }
-  vertex_adj_arr = new VertexAdj[cap];
   _v_adj_order_sum_arr = new int[cap];
   sorted_vertex_arr = new int[cap];
+  vertex_adj_arr = new_vertex_adj_arr;
+}
 
-  for (int i = 0; i < cap; i++) {
+void Graph::clear() {
+  is_sorted = false;
+
+  for (int i = 0; i < len; i++) {
     _v_adj_order_sum_arr[i] = -1;
     sorted_vertex_arr[i] = i;
   }
+}
+void Graph::resize_clear(int new_cap) {
+  resize(new_cap);
+  clear();
 }
 
 int Graph::vertex_adj_order_sum(int v) {

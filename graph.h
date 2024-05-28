@@ -30,6 +30,10 @@ struct Graph {
 
   Graph();
   void resize_clear(int);
+
+  void resize(int);
+  void clear();
+
   int vertex_adj_order_sum(int);
 
   void sort_vertex_by_degree_descending();
