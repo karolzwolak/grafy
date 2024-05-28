@@ -25,6 +25,7 @@ struct Graph {
   // the sorted vertex array by degree
   int *sorted_vertex_arr;
   bool is_sorted;
+  Queue queue;
   std::default_random_engine gen;
 
   Graph();
@@ -39,11 +40,11 @@ struct Graph {
   void swap_vertex(int, int);
 
   int bfs_with_max_dist(int start_v, int *component_elems,
-                        int &component_len_out, Queue &queue, int *dist_start);
+                        int &component_len_out, int *dist_start);
 
   void single_component_vertices_eccentricity(int start_v, int *eccentrity_out,
                                               int *component_elems,
-                                              Queue &queue, int *dist_start,
-                                              int *dist_u, int *dist_v);
+                                              int *dist_start, int *dist_u,
+                                              int *dist_v);
   int vertices_eccentricity_and_n_components(int *eccentricity_out);
 };

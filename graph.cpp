@@ -21,7 +21,7 @@ void VertexAdj::resize_clear(int new_cap) {
 
 Graph::Graph()
     : len(0), cap(0), vertex_adj_arr(nullptr), _v_adj_order_sum_arr(nullptr),
-      sorted_vertex_arr(nullptr), is_sorted(false) {
+      sorted_vertex_arr(nullptr), is_sorted(false), queue(Queue()) {
   std::random_device rd;
   gen = std::default_random_engine(rd());
 }
@@ -29,6 +29,7 @@ Graph::Graph()
 void Graph::resize_clear(int new_cap) {
   is_sorted = false;
   len = new_cap;
+  queue.resize_clear(new_cap);
   if (new_cap <= cap) {
     return;
   }
@@ -113,8 +114,7 @@ void Graph::swap_vertex(int i, int j) {
 }
 
 int Graph::bfs_with_max_dist(int start_v, int *component_elems,
-                             int &component_len_out, Queue &queue,
-                             int *dist_start) {
+                             int &component_len_out, int *dist_start) {
   int max_dist = 0;
   int max_dist_v = start_v;
 
@@ -147,15 +147,17 @@ int Graph::bfs_with_max_dist(int start_v, int *component_elems,
   return max_dist_v;
 }
 
-void Graph::single_component_vertices_eccentricity(
-    int start_v, int *eccentrity_out, int *component_elems, Queue &queue,
-    int *dist_start, int *dist_u, int *dist_v) {
+void Graph::single_component_vertices_eccentricity(int start_v,
+                                                   int *eccentrity_out,
+                                                   int *component_elems,
+                                                   int *dist_start, int *dist_u,
+                                                   int *dist_v) {
 
   int component_len = 0;
-  int u = bfs_with_max_dist(start_v, component_elems, component_len, queue,
-                            dist_start);
-  int v = bfs_with_max_dist(u, component_elems, component_len, queue, dist_u);
-  bfs_with_max_dist(v, component_elems, component_len, queue, dist_v);
+  int u =
+      bfs_with_max_dist(start_v, component_elems, component_len, dist_start);
+  int v = bfs_with_max_dist(u, component_elems, component_len, dist_u);
+  bfs_with_max_dist(v, component_elems, component_len, dist_v);
 
   for (int i = 0; i < component_len; i++) {
     int w = component_elems[i];
@@ -167,8 +169,6 @@ void Graph::single_component_vertices_eccentricity(
 
 int Graph::vertices_eccentricity_and_n_components(int *eccentricity_out) {
   int n_components = 0;
-  Queue queue;
-  queue.resize_clear(len);
   int *component_elems = new int[len];
 
   int *dist_start = new int[len];
@@ -186,7 +186,7 @@ int Graph::vertices_eccentricity_and_n_components(int *eccentricity_out) {
     }
     n_components++;
     single_component_vertices_eccentricity(i, eccentricity_out, component_elems,
-                                           queue, dist_start, dist_u, dist_v);
+                                           dist_start, dist_u, dist_v);
   }
   delete[] component_elems;
   delete[] dist_start;
