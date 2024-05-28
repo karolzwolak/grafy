@@ -1,7 +1,6 @@
 #pragma once
 
 #include "queue.h"
-#include <random>
 
 int max(int, int);
 int min(int, int);
@@ -25,7 +24,6 @@ struct Graph {
   // the sorted vertex array by degree
   int *sorted_vertex_arr;
   bool is_sorted;
-  std::default_random_engine gen;
 
   Graph();
   void resize_clear(int);

@@ -21,10 +21,7 @@ void VertexAdj::resize_clear(int new_cap) {
 
 Graph::Graph()
     : len(0), cap(0), vertex_adj_arr(nullptr), _v_adj_order_sum_arr(nullptr),
-      sorted_vertex_arr(nullptr), is_sorted(false) {
-  std::random_device rd;
-  gen = std::default_random_engine(rd());
-}
+      sorted_vertex_arr(nullptr), is_sorted(false) {}
 
 void Graph::resize_clear(int new_cap) {
   is_sorted = false;
@@ -102,8 +99,7 @@ int Graph::partition_by_degree(int left, int right) {
 }
 
 int Graph::choose_pivot([[maybe_unused]] int left, int right) {
-  auto dis = std::uniform_int_distribution<int>(left, right);
-  return dis(gen);
+  return (left + right) / 2;
 }
 
 void Graph::swap_vertex(int i, int j) {
