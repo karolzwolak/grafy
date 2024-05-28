@@ -43,16 +43,15 @@ void solve_graph(Graph &graph) {
   // 1
   solve_degree_sequence(graph);
 
-  int *eccentrities = new int[graph.len];
   // 2
-  int n_components = graph.vertices_eccentricity_and_n_components(eccentrities);
-  std::cout << n_components << "\n";
+  graph.vertices_eccentricity_and_component_count();
+  std::cout << graph.component_count << "\n";
 
   // 3
   std::cout << "?\n";
   // 4
   for (int i = 0; i < graph.len; i++) {
-    std::cout << eccentrities[i] << " ";
+    std::cout << graph.eccentrities[i] << " ";
   }
   std::cout << "\n";
   // 5
@@ -70,8 +69,8 @@ void solve_graph(Graph &graph) {
 }
 
 int main() {
-  std::ios_base::sync_with_stdio(false);
-  std::cin.tie(nullptr);
+  // std::ios_base::sync_with_stdio(false);
+  // std::cin.tie(nullptr);
 
   int test_cases;
   std::cin >> test_cases;

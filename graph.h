@@ -25,6 +25,11 @@ struct Graph {
   // the sorted vertex array by degree
   int *sorted_vertex_arr;
   bool is_sorted;
+  int *eccentrities;
+
+  int *dist_start;
+  int *component_elems;
+  int component_count;
 
   Queue queue;
 
@@ -43,10 +48,9 @@ struct Graph {
   int choose_pivot(int, int);
   void swap_vertex(int, int);
 
-  int bfs_with_max_dist(int start_v, int *component_elems,
-                        int &component_len_out, int *dist_start);
-  void single_component_vertices_eccentricity(int start_v, int *component_elems,
-                                              int *eccentrity_out,
-                                              int *dist_start);
-  int vertices_eccentricity_and_n_components(int *eccentricity_out);
+  int bfs_eccentrity_and_comp_len(int start_v);
+  void bfs_eccentrity_with_comp_len(int start_v, int comp_len);
+
+  void single_comp_eccentrity(int start_v);
+  void vertices_eccentricity_and_component_count();
 };

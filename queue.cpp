@@ -2,10 +2,7 @@
 
 Queue::Queue() : front(0), rear(0), len(0), cap(0), arr(nullptr) {}
 
-void Queue::resize_clear(int new_cap) {
-  front = 0;
-  rear = 0;
-  len = 0;
+void Queue::resize(int new_cap) {
   if (cap >= new_cap) {
     return;
   }
@@ -15,6 +12,17 @@ void Queue::resize_clear(int new_cap) {
   }
   cap = new_cap;
   arr = new int[cap];
+}
+
+void Queue::clear() {
+  front = 0;
+  rear = 0;
+  len = 0;
+}
+
+void Queue::resize_clear(int new_cap) {
+  resize(new_cap);
+  clear();
 }
 
 void Queue::add(int val) {
