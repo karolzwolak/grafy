@@ -25,8 +25,8 @@ struct Graph {
   // the sorted vertex array by degree
   int *sorted_vertex_arr;
   bool is_sorted;
+
   Queue queue;
-  std::mt19937 gen;
 
   Graph();
   void resize_clear(int);

@@ -1,6 +1,7 @@
 #include "graph.h"
 #include "queue.h"
-#include <random>
+#include <cstdlib>
+#include <ctime>
 
 int min(int a, int b) { return a < b ? a : b; }
 int max(int a, int b) { return a > b ? a : b; }
@@ -22,8 +23,7 @@ void VertexAdj::resize_clear(int new_cap) {
 Graph::Graph()
     : len(0), cap(0), vertex_adj_arr(nullptr), _v_adj_order_sum_arr(nullptr),
       sorted_vertex_arr(nullptr), is_sorted(false), queue(Queue()) {
-  std::random_device rd;
-  gen = std::mt19937(rd());
+  srand(time(NULL));
 }
 
 void Graph::resize_clear(int new_cap) {
@@ -102,9 +102,8 @@ int Graph::partition_by_degree(int left, int right) {
   return i;
 }
 
-int Graph::choose_pivot([[maybe_unused]] int left, int right) {
-  auto dis = std::uniform_int_distribution<int>(left, right);
-  return dis(gen);
+int Graph::choose_pivot(int left, int right) {
+  return rand() % (right - left + 1) + left;
 }
 
 void Graph::swap_vertex(int i, int j) {
