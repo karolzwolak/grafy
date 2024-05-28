@@ -26,7 +26,7 @@ struct Graph {
   int *sorted_vertex_arr;
   bool is_sorted;
   Queue queue;
-  std::default_random_engine gen;
+  std::mt19937 gen;
 
   Graph();
   void resize_clear(int);

@@ -23,7 +23,7 @@ Graph::Graph()
     : len(0), cap(0), vertex_adj_arr(nullptr), _v_adj_order_sum_arr(nullptr),
       sorted_vertex_arr(nullptr), is_sorted(false), queue(Queue()) {
   std::random_device rd;
-  gen = std::default_random_engine(rd());
+  gen = std::mt19937(rd());
 }
 
 void Graph::resize_clear(int new_cap) {
