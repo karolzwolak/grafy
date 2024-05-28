@@ -41,10 +41,8 @@ struct Graph {
 
   int bfs_with_max_dist(int start_v, int *component_elems,
                         int &component_len_out, int *dist_start);
-
-  void single_component_vertices_eccentricity(int start_v, int *eccentrity_out,
-                                              int *component_elems,
-                                              int *dist_start, int *dist_u,
-                                              int *dist_v);
+  void single_component_vertices_eccentricity(int start_v, int *component_elems,
+                                              int *eccentrity_out,
+                                              int *dist_start);
   int vertices_eccentricity_and_n_components(int *eccentricity_out);
 };

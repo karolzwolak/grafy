@@ -115,11 +115,12 @@ void Graph::swap_vertex(int i, int j) {
 
 int Graph::bfs_with_max_dist(int start_v, int *component_elems,
                              int &component_len_out, int *dist_start) {
-  int max_dist = 0;
-  int max_dist_v = start_v;
+  int next_dist = 1;
 
-  component_elems[0] = start_v;
-  component_len_out = 1;
+  if (component_elems != nullptr) {
+    component_elems[0] = start_v;
+    component_len_out = 1;
+  }
 
   dist_start[start_v] = 0;
   queue.add(start_v);
@@ -127,43 +128,41 @@ int Graph::bfs_with_max_dist(int start_v, int *component_elems,
   while (queue.len > 0) {
     int v = queue.remove();
 
-    int next_dist = dist_start[v] + 1;
+    next_dist = dist_start[v] + 1;
     for (int i = 0; i < vertex_adj_arr[v].len; i++) {
       int u = vertex_adj_arr[v].adj[i];
       if (dist_start[u] != -1) {
         continue;
       }
-      queue.add(u);
-      component_elems[component_len_out++] = u;
-
-      dist_start[u] = next_dist;
-
-      if (dist_start[u] > max_dist) {
-        max_dist = dist_start[u];
-        max_dist_v = u;
+      if (component_elems != nullptr) {
+        component_elems[component_len_out++] = u;
       }
+
+      queue.add(u);
+      dist_start[u] = next_dist;
     }
   }
-  return max_dist_v;
+  return next_dist - 1;
 }
 
 void Graph::single_component_vertices_eccentricity(int start_v,
-                                                   int *eccentrity_out,
                                                    int *component_elems,
-                                                   int *dist_start, int *dist_u,
-                                                   int *dist_v) {
+                                                   int *eccentrity_out,
+                                                   int *dist_start) {
 
   int component_len = 0;
-  int u =
+  eccentrity_out[start_v] =
       bfs_with_max_dist(start_v, component_elems, component_len, dist_start);
-  int v = bfs_with_max_dist(u, component_elems, component_len, dist_u);
-  bfs_with_max_dist(v, component_elems, component_len, dist_v);
 
-  for (int i = 0; i < component_len; i++) {
-    int w = component_elems[i];
-    int u_dist = dist_u[w];
-    int v_dist = dist_v[w];
-    eccentrity_out[w] = max(u_dist, v_dist);
+  // i = 1 to skip start_v
+  for (int i = 1; i < component_len; i++) {
+    int v = component_elems[i];
+    for (int j = 0; j < component_len; j++) {
+      dist_start[component_elems[j]] = -1;
+    }
+
+    eccentrity_out[v] =
+        bfs_with_max_dist(v, nullptr, component_len, dist_start);
   }
 }
 
@@ -172,12 +171,9 @@ int Graph::vertices_eccentricity_and_n_components(int *eccentricity_out) {
   int *component_elems = new int[len];
 
   int *dist_start = new int[len];
-  int *dist_u = new int[len];
-  int *dist_v = new int[len];
   for (int i = 0; i < len; i++) {
     dist_start[i] = -1;
-    dist_u[i] = -1;
-    dist_v[i] = -1;
+    eccentricity_out[i] = 0;
   }
 
   for (int i = 0; i < len; i++) {
@@ -185,13 +181,11 @@ int Graph::vertices_eccentricity_and_n_components(int *eccentricity_out) {
       continue;
     }
     n_components++;
-    single_component_vertices_eccentricity(i, eccentricity_out, component_elems,
-                                           dist_start, dist_u, dist_v);
+    single_component_vertices_eccentricity(i, component_elems, eccentricity_out,
+                                           dist_start);
   }
   delete[] component_elems;
   delete[] dist_start;
-  delete[] dist_u;
-  delete[] dist_v;
 
   return n_components;
 }
