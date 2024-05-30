@@ -1,8 +1,6 @@
 #include "graph.h"
 #include <iostream>
 
-#define STACK_QUEUE_SIZE 1'000'000
-
 void parse_graph(Graph &graph_out) {
   int vertex_len;
   std::cin >> vertex_len;
@@ -80,10 +78,7 @@ int main() {
   int test_cases;
   std::cin >> test_cases;
 
-  int queue_arr[STACK_QUEUE_SIZE];
-  Queue q(STACK_QUEUE_SIZE, queue_arr);
-
-  Graph graph(q);
+  Graph graph;
   for (int i = 0; i < test_cases; i++) {
     parse_graph(graph);
     // print_graph(graph);

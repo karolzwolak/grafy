@@ -29,7 +29,7 @@ struct Graph {
 
   Queue queue;
 
-  Graph(Queue &queue);
+  Graph();
   void resize_clear(int);
 
   void resize(int);

@@ -18,10 +18,10 @@ void VertexAdj::resize_clear(int new_cap) {
   adj = new int[cap];
 }
 
-Graph::Graph(Queue &queue)
+Graph::Graph()
     : len(0), cap(0), vertex_adj_arr(nullptr), sorted_vertex_arr(nullptr),
       is_sorted(false), eccentrities(nullptr), dist_start(nullptr),
-      component_elems(nullptr), component_count(0), queue(queue) {}
+      component_elems(nullptr), component_count(0), queue(Queue()) {}
 
 void Graph::resize(int new_cap) {
   len = new_cap;

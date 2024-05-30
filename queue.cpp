@@ -1,18 +1,13 @@
 #include "queue.h"
 
-Queue::Queue(int cap, int *arr)
-    : front(0), rear(0), len(0), cap(cap), arr(arr) {}
+Queue::Queue() : front(0), rear(0), len(0), cap(STACK_QUEUE_SIZE) {}
 
 void Queue::resize(int new_cap) {
   if (cap >= new_cap) {
     return;
   }
 
-  if (arr != nullptr) {
-    delete[] arr;
-  }
   cap = new_cap;
-  arr = new int[cap];
 }
 
 void Queue::clear() {
