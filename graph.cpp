@@ -137,76 +137,40 @@ void Graph::swap_vertex(int i, int j) {
   sorted_vertex_arr[j] = tmp;
 }
 
-int Graph::bfs_eccentrity_and_comp_len(int start_v) {
+void Graph::bfs_eccentricity(int start_v) {
   int max_dist = 0;
-
-  component_elems[0] = start_v;
   int component_len = 1;
 
+  component_elems[0] = start_v;
   dist_start[start_v] = 0;
   queue.add(start_v);
 
-  while (queue.len > 0 && component_len < len) {
+  while (queue.len > 0) {
     int v = queue.remove();
-
     int next_dist = dist_start[v] + 1;
+
     for (int i = 0; i < vertex_adj_arr[v].len; i++) {
       int u = vertex_adj_arr[v].adj[i];
       if (dist_start[u] != -1) {
         continue;
       }
+
       component_elems[component_len++] = u;
-
       queue.add(u);
       dist_start[u] = next_dist;
       max_dist = next_dist;
     }
   }
   queue.clear();
-  eccentrities[start_v] = max_dist;
 
-  return component_len;
-}
-
-void Graph::bfs_eccentrity_with_comp_len(int start_v, int comp_len) {
-  int max_dist = 0;
-  int unique = 1;
-
-  dist_start[start_v] = 0;
-  queue.add(start_v);
-
-  while (queue.len > 0 && unique < comp_len) {
-    int v = queue.remove();
-
-    int next_dist = dist_start[v] + 1;
-    for (int i = 0; i < vertex_adj_arr[v].len; i++) {
-      int u = vertex_adj_arr[v].adj[i];
-      if (dist_start[u] != -1) {
-        continue;
-      }
-
-      unique++;
-      queue.add(u);
-      dist_start[u] = next_dist;
-      max_dist = next_dist;
-    }
+  for (int i = 0; i < component_len; i++) {
+    eccentrities[component_elems[i]] = max_dist;
   }
-  queue.clear();
-  eccentrities[start_v] = max_dist;
 }
 
 void Graph::single_comp_eccentrity(int start_v) {
-  int component_len = bfs_eccentrity_and_comp_len(start_v);
+  bfs_eccentricity(start_v);
   component_count++;
-
-  // i = 1 to skip start_v
-  for (int i = 1; i < component_len; i++) {
-    int v = component_elems[i];
-    for (int j = 0; j < component_len; j++) {
-      dist_start[component_elems[j]] = -1;
-    }
-    bfs_eccentrity_with_comp_len(v, component_len);
-  }
 }
 
 void Graph::vertices_eccentricity_and_component_count() {
