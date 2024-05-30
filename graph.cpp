@@ -138,9 +138,7 @@ void Graph::swap_vertex(int i, int j) {
 }
 
 void Graph::bfs_eccentricity(int start_v) {
-  int max_dist = 0;
   int component_len = 1;
-
   component_elems[0] = start_v;
   dist_start[start_v] = 0;
   queue.add(start_v);
@@ -158,13 +156,37 @@ void Graph::bfs_eccentricity(int start_v) {
       component_elems[component_len++] = u;
       queue.add(u);
       dist_start[u] = next_dist;
-      max_dist = next_dist;
     }
   }
   queue.clear();
 
   for (int i = 0; i < component_len; i++) {
-    eccentrities[component_elems[i]] = max_dist;
+    int v = component_elems[i];
+    int max_dist = 0;
+    dist_start[v] = 0;
+    queue.add(v);
+
+    while (queue.len > 0) {
+      int u = queue.remove();
+      int next_dist = dist_start[u] + 1;
+
+      for (int j = 0; j < vertex_adj_arr[u].len; j++) {
+        int w = vertex_adj_arr[u].adj[j];
+        if (dist_start[w] != -1) {
+          continue;
+        }
+
+        queue.add(w);
+        dist_start[w] = next_dist;
+        max_dist = next_dist;
+      }
+    }
+    queue.clear();
+    eccentrities[v] = max_dist;
+
+    for (int j = 0; j < component_len; j++) {
+      dist_start[component_elems[j]] = -1;
+    }
   }
 }
 
