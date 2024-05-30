@@ -2,3 +2,4 @@ main
 dbg
 tests
 *perf*
+.aider*
