@@ -112,33 +112,46 @@ void Graph::quicksort_by_degree(int left, int right) {
 }
 
 bool Graph::vertex_prior_other(int u_i, int v_i) {
+  if (u_i == v_i) {
+    return true;
+  }
   int u = sorted_vertex_arr[u_i];
   int v = sorted_vertex_arr[v_i];
   int u_deg = vertex_adj_arr[u].len;
   int v_deg = vertex_adj_arr[v].len;
 
-  return u_deg > v_deg ||
-         (u_deg == v_deg && vertex_adj_order_sum(u) >= vertex_adj_order_sum(v));
+  return u_deg < v_deg || (u_deg == v_deg && u < v);
 }
 
 int Graph::partition_by_degree(int left, int right) {
-  int pivot = choose_pivot(left, right);
-  swap_vertex(pivot, right);
-  pivot = right;
+  int mid = (left + right) / 2;
+  if (vertex_prior_other(mid, left)) {
+    swap_vertex(left, mid);
+  }
+  if (vertex_prior_other(right, left)) {
+    swap_vertex(left, right);
+  }
+  if (vertex_prior_other(mid, right)) {
+    swap_vertex(mid, right);
+  }
+  int pivot = right;
+
+  int pivot_v = sorted_vertex_arr[pivot];
+  int pivot_deg = vertex_adj_arr[pivot_v].len;
 
   int i = left;
+
   for (int j = left; j < right; j++) {
-    if (vertex_prior_other(j, pivot)) {
+    int j_v = sorted_vertex_arr[j];
+    int j_deg = vertex_adj_arr[j_v].len;
+
+    if (j_deg < pivot_deg || (j_deg == pivot_deg && j_v < pivot_v)) {
       swap_vertex(i, j);
       i++;
     }
   }
   swap_vertex(i, pivot);
   return i;
-}
-
-int Graph::choose_pivot(int left, int right) {
-  return rand() % (right - left + 1) + left;
 }
 
 void Graph::swap_vertex(int i, int j) {
