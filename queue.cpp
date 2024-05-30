@@ -1,6 +1,7 @@
 #include "queue.h"
 
-Queue::Queue() : front(0), rear(0), len(0), cap(0), arr(nullptr) {}
+Queue::Queue(int cap, int *arr)
+    : front(0), rear(0), len(0), cap(cap), arr(arr) {}
 
 void Queue::resize(int new_cap) {
   if (cap >= new_cap) {
