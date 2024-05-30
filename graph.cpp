@@ -138,7 +138,7 @@ void Graph::swap_vertex(int i, int j) {
 }
 
 int Graph::bfs_eccentrity_and_comp_len(int start_v) {
-  int next_dist = 0;
+  int max_dist = 0;
 
   component_elems[0] = start_v;
   int component_len = 1;
@@ -149,7 +149,7 @@ int Graph::bfs_eccentrity_and_comp_len(int start_v) {
   while (queue.len > 0 && component_len < len) {
     int v = queue.remove();
 
-    next_dist = dist_start[v] + 1;
+    int next_dist = dist_start[v] + 1;
     for (int i = 0; i < vertex_adj_arr[v].len; i++) {
       int u = vertex_adj_arr[v].adj[i];
       if (dist_start[u] != -1) {
@@ -159,16 +159,17 @@ int Graph::bfs_eccentrity_and_comp_len(int start_v) {
 
       queue.add(u);
       dist_start[u] = next_dist;
+      max_dist = next_dist;
     }
   }
   queue.clear();
-  eccentrities[start_v] = next_dist;
+  eccentrities[start_v] = max_dist;
 
   return component_len;
 }
 
 void Graph::bfs_eccentrity_with_comp_len(int start_v, int comp_len) {
-  int next_dist = 0;
+  int max_dist = 0;
   int unique = 1;
 
   dist_start[start_v] = 0;
@@ -177,7 +178,7 @@ void Graph::bfs_eccentrity_with_comp_len(int start_v, int comp_len) {
   while (queue.len > 0 && unique < comp_len) {
     int v = queue.remove();
 
-    next_dist = dist_start[v] + 1;
+    int next_dist = dist_start[v] + 1;
     for (int i = 0; i < vertex_adj_arr[v].len; i++) {
       int u = vertex_adj_arr[v].adj[i];
       if (dist_start[u] != -1) {
@@ -187,10 +188,11 @@ void Graph::bfs_eccentrity_with_comp_len(int start_v, int comp_len) {
       unique++;
       queue.add(u);
       dist_start[u] = next_dist;
+      max_dist = next_dist;
     }
   }
   queue.clear();
-  eccentrities[start_v] = next_dist;
+  eccentrities[start_v] = max_dist;
 }
 
 void Graph::single_comp_eccentrity(int start_v) {
@@ -219,6 +221,6 @@ void Graph::vertices_eccentricity_and_component_count() {
 }
 
 void Graph::calculate_properties() {
-  sort_vertex_by_degree_descending();
   vertices_eccentricity_and_component_count();
+  sort_vertex_by_degree_descending();
 }
