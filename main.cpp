@@ -36,7 +36,11 @@ void solve_graph(Graph &graph) {
   std::cout << graph.component_count << "\n";
 
   // 3
-  std::cout << "?\n";
+  if (graph.is_bipartile) {
+    std::cout << "T\n";
+  } else {
+    std::cout << "F\n";
+  }
   // 4
   print_ecentricities(graph);
   // 5

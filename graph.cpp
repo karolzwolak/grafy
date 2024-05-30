@@ -22,7 +22,8 @@ void VertexAdj::resize_clear(int new_cap) {
 Graph::Graph()
     : len(0), cap(0), vertex_adj_arr(nullptr), sorted_vertex_arr(nullptr),
       is_sorted(false), eccentrities(nullptr), dist_start(nullptr),
-      component_elems(nullptr), component_count(0), edge_count(0),
+      component_elems(nullptr), component_count(0), stack(nullptr),
+      bipartile_group(nullptr), is_bipartile(true), edge_count(0),
       complement_edges(0), queue(Queue()) {}
 
 void Graph::resize(int new_cap) {
@@ -48,12 +49,20 @@ void Graph::resize(int new_cap) {
     delete[] eccentrities;
     delete[] dist_start;
     delete[] component_elems;
+
+    delete[] stack;
+
+    delete[] bipartile_group;
   }
   sorted_vertex_arr = new int[cap];
 
   eccentrities = new int[cap];
   dist_start = new int[cap];
   component_elems = new int[cap];
+
+  stack = new int[cap];
+
+  bipartile_group = new int[cap];
 
   vertex_adj_arr = new_vertex_adj_arr;
 }
@@ -69,6 +78,7 @@ void Graph::clear() {
 
     eccentrities[i] = 0;
     dist_start[i] = -1;
+    bipartile_group[i] = -1;
   }
 }
 void Graph::resize_clear(int new_cap) {
@@ -245,9 +255,48 @@ void Graph::vertices_eccentricity_and_component_count() {
   }
 }
 
+bool Graph::dfs_check_bipartite(int start_v) {
+  int stack_len = 1;
+  stack[0] = start_v;
+
+  bipartile_group[start_v] = 0;
+
+  while (stack_len > 0) {
+    int v = stack[--stack_len];
+
+    int color = 1 - bipartile_group[v];
+
+    for (int i = 0; i < vertex_adj_arr[v].len; i++) {
+      int u = vertex_adj_arr[v].adj[i];
+
+      if (bipartile_group[u] == -1) {
+        stack[stack_len++] = u;
+        bipartile_group[u] = color;
+      } else if (bipartile_group[u] != color) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+void Graph::check_bipartile() {
+  is_bipartile = true;
+  for (int i = 0; i < len; i++) {
+    if (bipartile_group[i] != -1) {
+      continue;
+    }
+    if (!dfs_check_bipartite(i)) {
+      is_bipartile = false;
+      break;
+    }
+  }
+}
+
 void Graph::calculate_properties() {
   vertices_eccentricity_and_component_count();
   sort_vertex_by_degree_descending();
+  check_bipartile();
   long long max_edges = ((long long)len * (len - 1)) / 2;
   complement_edges = max_edges - edge_count / 2;
 }

@@ -27,6 +27,11 @@ struct Graph {
   int *component_elems;
   int component_count;
 
+  int *stack;
+
+  int *bipartile_group;
+  bool is_bipartile;
+
   int edge_count;
   long long complement_edges;
 
@@ -50,6 +55,9 @@ struct Graph {
 
   int bfs_eccentrity_and_comp_len(int start_v);
   void bfs_eccentrity_with_comp_len(int start_v, int comp_len);
+
+  bool dfs_check_bipartite(int start_v);
+  void check_bipartile();
 
   void single_comp_eccentrity(int start_v);
   void vertices_eccentricity_and_component_count();
