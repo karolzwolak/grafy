@@ -56,7 +56,7 @@ void solve_graph(Graph &graph) {
   // 3
   std::cout << "?\n";
   // 4
-  // print_ecentricities(graph);
+  print_ecentricities(graph);
   std::cout << "?\n";
   // 5
   std::cout << "?\n";
