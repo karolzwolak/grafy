@@ -1,5 +1,5 @@
 #include "graph.h"
-#include "iostream"
+#include <iostream>
 
 void parse_graph(Graph &graph_out) {
   int vertex_len;
@@ -30,30 +30,34 @@ void print_graph(const Graph &graph) {
   }
 }
 
-void solve_degree_sequence(Graph &graph) {
-  graph.sort_vertex_by_degree_descending();
-  for (int i = 0; i < graph.len; i++) {
+void print_degree_sequence(Graph &graph) {
+  for (int i = graph.len - 1; i >= 0; i--) {
     int vertex = graph.sorted_vertex_arr[i];
     std::cout << graph.vertex_adj_arr[vertex].len << " ";
   }
   std::cout << "\n";
 }
 
+void print_ecentricities(Graph &graph) {
+  for (int i = 0; i < graph.len; i++) {
+    std::cout << graph.eccentrities[i] << " ";
+  }
+  std::cout << "\n";
+}
+
 void solve_graph(Graph &graph) {
+  graph.calculate_properties();
   // 1
-  solve_degree_sequence(graph);
+  print_degree_sequence(graph);
 
   // 2
-  graph.vertices_eccentricity_and_component_count();
   std::cout << graph.component_count << "\n";
 
   // 3
   std::cout << "?\n";
   // 4
-  for (int i = 0; i < graph.len; i++) {
-    std::cout << graph.eccentrities[i] << " ";
-  }
-  std::cout << "\n";
+  // print_ecentricities(graph);
+  std::cout << "?\n";
   // 5
   std::cout << "?\n";
   // 6
@@ -69,8 +73,8 @@ void solve_graph(Graph &graph) {
 }
 
 int main() {
-  // std::ios_base::sync_with_stdio(false);
-  // std::cin.tie(nullptr);
+  std::ios_base::sync_with_stdio(false);
+  std::cin.tie(nullptr);
 
   int test_cases;
   std::cin >> test_cases;

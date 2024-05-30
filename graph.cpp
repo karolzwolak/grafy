@@ -1,7 +1,5 @@
 #include "graph.h"
 #include "queue.h"
-#include <cstdlib>
-#include <ctime>
 
 int min(int a, int b) { return a < b ? a : b; }
 int max(int a, int b) { return a > b ? a : b; }
@@ -21,13 +19,9 @@ void VertexAdj::resize_clear(int new_cap) {
 }
 
 Graph::Graph()
-    : len(0), cap(0), vertex_adj_arr(nullptr), _v_adj_order_sum_arr(nullptr),
-      sorted_vertex_arr(nullptr), is_sorted(false), eccentrities(nullptr),
-      dist_start(nullptr), component_elems(nullptr), component_count(0),
-      queue(Queue()) {
-
-  srand(time(NULL));
-}
+    : len(0), cap(0), vertex_adj_arr(nullptr), sorted_vertex_arr(nullptr),
+      is_sorted(false), eccentrities(nullptr), dist_start(nullptr),
+      component_elems(nullptr), component_count(0), queue(Queue()) {}
 void Graph::resize(int new_cap) {
   len = new_cap;
   queue.resize_clear(new_cap);
@@ -46,20 +40,16 @@ void Graph::resize(int new_cap) {
       new_vertex_adj_arr[i] = VertexAdj();
     }
     delete[] vertex_adj_arr;
-    delete[] _v_adj_order_sum_arr;
-
     delete[] sorted_vertex_arr;
-    delete[] eccentrities;
 
+    delete[] eccentrities;
     delete[] dist_start;
     delete[] component_elems;
   }
-  _v_adj_order_sum_arr = new int[cap];
   sorted_vertex_arr = new int[cap];
 
   eccentrities = new int[cap];
   dist_start = new int[cap];
-
   component_elems = new int[cap];
 
   vertex_adj_arr = new_vertex_adj_arr;
@@ -70,7 +60,6 @@ void Graph::clear() {
   component_count = 0;
 
   for (int i = 0; i < len; i++) {
-    _v_adj_order_sum_arr[i] = -1;
     sorted_vertex_arr[i] = i;
 
     eccentrities[i] = 0;
@@ -80,18 +69,6 @@ void Graph::clear() {
 void Graph::resize_clear(int new_cap) {
   resize(new_cap);
   clear();
-}
-
-int Graph::vertex_adj_order_sum(int v) {
-  if (_v_adj_order_sum_arr[v] != -1) {
-    return _v_adj_order_sum_arr[v];
-  }
-  int sum = 0;
-  for (int i = 0; i < vertex_adj_arr[v].len; i++) {
-    sum += vertex_adj_arr[v].adj[i];
-  }
-  _v_adj_order_sum_arr[v] = sum;
-  return sum;
 }
 
 void Graph::sort_vertex_by_degree_descending() {
@@ -218,6 +195,7 @@ void Graph::bfs_eccentrity_with_comp_len(int start_v, int comp_len) {
 
 void Graph::single_comp_eccentrity(int start_v) {
   int component_len = bfs_eccentrity_and_comp_len(start_v);
+  component_count++;
 
   // i = 1 to skip start_v
   for (int i = 1; i < component_len; i++) {
@@ -238,4 +216,9 @@ void Graph::vertices_eccentricity_and_component_count() {
     }
     single_comp_eccentrity(i);
   }
+}
+
+void Graph::calculate_properties() {
+  sort_vertex_by_degree_descending();
+  vertices_eccentricity_and_component_count();
 }
