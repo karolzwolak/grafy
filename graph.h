@@ -25,6 +25,7 @@ struct Graph {
 
   int *dist_start;
   int *component_elems;
+  int *vertex_leader;
   int component_count;
 
   Queue queue;
