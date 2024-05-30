@@ -1,5 +1,6 @@
 #include "graph.h"
 #include "queue.h"
+#include <iostream>
 
 int min(int a, int b) { return a < b ? a : b; }
 int max(int a, int b) { return a > b ? a : b; }
@@ -21,7 +22,9 @@ void VertexAdj::resize_clear(int new_cap) {
 Graph::Graph()
     : len(0), cap(0), vertex_adj_arr(nullptr), sorted_vertex_arr(nullptr),
       is_sorted(false), eccentrities(nullptr), dist_start(nullptr),
-      component_elems(nullptr), component_count(0), queue(Queue()) {}
+      component_elems(nullptr), component_count(0), edge_count(0),
+      complement_edges(0), queue(Queue()) {}
+
 void Graph::resize(int new_cap) {
   len = new_cap;
   queue.resize_clear(new_cap);
@@ -58,6 +61,8 @@ void Graph::resize(int new_cap) {
 void Graph::clear() {
   is_sorted = false;
   component_count = 0;
+  edge_count = 0;
+  complement_edges = 0;
 
   for (int i = 0; i < len; i++) {
     sorted_vertex_arr[i] = i;
@@ -69,6 +74,26 @@ void Graph::clear() {
 void Graph::resize_clear(int new_cap) {
   resize(new_cap);
   clear();
+}
+
+void Graph::parse_from_stdin() {
+  int vertex_len;
+  std::cin >> vertex_len;
+  resize_clear(vertex_len);
+
+  for (int i = 0; i < vertex_len; i++) {
+    int edge_len;
+    std::cin >> edge_len;
+
+    edge_count += edge_len;
+    vertex_adj_arr[i].resize_clear(edge_len);
+
+    for (int j = 0; j < edge_len; j++) {
+      int edge_to;
+      std::cin >> edge_to;
+      vertex_adj_arr[i].adj[j] = edge_to - 1;
+    }
+  }
 }
 
 void Graph::sort_vertex_by_degree_descending() {
@@ -223,4 +248,6 @@ void Graph::vertices_eccentricity_and_component_count() {
 void Graph::calculate_properties() {
   vertices_eccentricity_and_component_count();
   sort_vertex_by_degree_descending();
+  long long max_edges = ((long long)len * (len - 1)) / 2;
+  complement_edges = max_edges - edge_count / 2;
 }

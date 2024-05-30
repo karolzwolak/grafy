@@ -27,9 +27,14 @@ struct Graph {
   int *component_elems;
   int component_count;
 
+  int edge_count;
+  long long complement_edges;
+
   Queue queue;
 
   Graph();
+
+  void parse_from_stdin();
   void resize_clear(int);
 
   void resize(int);

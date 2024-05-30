@@ -1,24 +1,6 @@
 #include "graph.h"
 #include <iostream>
 
-void parse_graph(Graph &graph_out) {
-  int vertex_len;
-  std::cin >> vertex_len;
-  graph_out.resize_clear(vertex_len);
-
-  for (int i = 0; i < vertex_len; i++) {
-    int edge_len;
-    std::cin >> edge_len;
-    graph_out.vertex_adj_arr[i].resize_clear(edge_len);
-
-    for (int j = 0; j < edge_len; j++) {
-      int edge_to;
-      std::cin >> edge_to;
-      graph_out.vertex_adj_arr[i].adj[j] = edge_to - 1;
-    }
-  }
-}
-
 void print_graph(const Graph &graph) {
   std::cout << "Graph:\n";
   for (int i = 0; i < graph.len; i++) {
@@ -68,7 +50,7 @@ void solve_graph(Graph &graph) {
   // 9
   std::cout << "?\n";
   // 10
-  std::cout << "?\n";
+  std::cout << graph.complement_edges << "\n";
 }
 
 int main() {
@@ -80,7 +62,7 @@ int main() {
 
   Graph graph;
   for (int i = 0; i < test_cases; i++) {
-    parse_graph(graph);
+    graph.parse_from_stdin();
     // print_graph(graph);
     solve_graph(graph);
   }
