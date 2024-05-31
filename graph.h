@@ -27,6 +27,10 @@ struct Graph {
   int *component_elems;
   int component_count;
 
+  int *dist_ref;
+  int *ecc_low;
+  int *ecc_upp;
+
   int *stack;
 
   int *bipartile_group;
@@ -53,12 +57,12 @@ struct Graph {
   int partition_by_degree(int, int);
   void swap_vertex(int, int);
 
-  int bfs_eccentrity_and_comp_len(int start_v);
+  int bfs_from_ref_and_comp_len(int ref_v);
   void bfs_eccentrity_with_comp_len(int start_v, int comp_len);
 
   bool dfs_check_bipartite(int start_v);
   void check_bipartile();
 
-  void single_comp_eccentrity(int start_v);
+  void single_comp_eccentrity(int ref_v);
   void vertices_eccentricity_and_component_count();
 };

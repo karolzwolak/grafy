@@ -1,5 +1,6 @@
 #include "graph.h"
 #include "queue.h"
+#include <climits>
 #include <iostream>
 
 int min(int a, int b) { return a < b ? a : b; }
@@ -22,7 +23,8 @@ void VertexAdj::resize_clear(int new_cap) {
 Graph::Graph()
     : len(0), cap(0), vertex_adj_arr(nullptr), sorted_vertex_arr(nullptr),
       is_sorted(false), eccentrities(nullptr), dist_start(nullptr),
-      component_elems(nullptr), component_count(0), stack(nullptr),
+      component_elems(nullptr), component_count(0), dist_ref(nullptr),
+      ecc_low(nullptr), ecc_upp(nullptr), stack(nullptr),
       bipartile_group(nullptr), is_bipartile(true), edge_count(0),
       complement_edges(0), queue(Queue()) {}
 
@@ -50,6 +52,10 @@ void Graph::resize(int new_cap) {
     delete[] dist_start;
     delete[] component_elems;
 
+    delete[] dist_ref;
+    delete[] ecc_low;
+    delete[] ecc_upp;
+
     delete[] stack;
 
     delete[] bipartile_group;
@@ -59,6 +65,10 @@ void Graph::resize(int new_cap) {
   eccentrities = new int[cap];
   dist_start = new int[cap];
   component_elems = new int[cap];
+
+  dist_ref = new int[cap];
+  ecc_low = new int[cap];
+  ecc_upp = new int[cap];
 
   stack = new int[cap];
 
@@ -77,6 +87,11 @@ void Graph::clear() {
     sorted_vertex_arr[i] = i;
 
     eccentrities[i] = 0;
+
+    dist_ref[i] = -1;
+    ecc_low[i] = 0;
+    ecc_upp[i] = INT_MAX;
+
     dist_start[i] = -1;
     bipartile_group[i] = -1;
   }
@@ -172,33 +187,32 @@ void Graph::swap_vertex(int i, int j) {
   sorted_vertex_arr[j] = tmp;
 }
 
-int Graph::bfs_eccentrity_and_comp_len(int start_v) {
+int Graph::bfs_from_ref_and_comp_len(int ref_v) {
   int max_dist = 0;
 
-  component_elems[0] = start_v;
+  component_elems[0] = ref_v;
   int component_len = 1;
 
-  dist_start[start_v] = 0;
-  queue.add(start_v);
+  dist_ref[ref_v] = 0;
+  queue.add(ref_v);
 
-  while (queue.len > 0 && component_len < len) {
+  while (queue.len > 0) {
     int v = queue.remove();
 
-    int next_dist = dist_start[v] + 1;
+    int next_dist = dist_ref[v] + 1;
     for (int i = 0; i < vertex_adj_arr[v].len; i++) {
       int u = vertex_adj_arr[v].adj[i];
-      if (dist_start[u] != -1) {
+      if (dist_ref[u] != -1) {
         continue;
       }
       component_elems[component_len++] = u;
 
       queue.add(u);
-      dist_start[u] = next_dist;
+      dist_ref[u] = next_dist;
       max_dist = next_dist;
     }
   }
-  queue.clear();
-  eccentrities[start_v] = max_dist;
+  eccentrities[ref_v] = max_dist;
 
   return component_len;
 }
@@ -230,28 +244,74 @@ void Graph::bfs_eccentrity_with_comp_len(int start_v, int comp_len) {
   eccentrities[start_v] = max_dist;
 }
 
-void Graph::single_comp_eccentrity(int start_v) {
-  int component_len = bfs_eccentrity_and_comp_len(start_v);
+void Graph::single_comp_eccentrity(int ref_v) {
+  // std::cout << "ref " << ref_v << "\n";
+  int component_len = bfs_from_ref_and_comp_len(ref_v);
   component_count++;
 
-  // i = 1 to skip start_v
+  int ecc_computed = 1;
+
   for (int i = 1; i < component_len; i++) {
     int v = component_elems[i];
-    for (int j = 0; j < component_len; j++) {
-      dist_start[component_elems[j]] = -1;
+
+    ecc_low[v] = max(dist_ref[v], eccentrities[ref_v] - dist_ref[v]);
+    ecc_upp[v] = eccentrities[ref_v] + dist_ref[v];
+
+    if (ecc_low[v] == ecc_upp[v]) {
+      eccentrities[v] = ecc_low[v];
+      ecc_computed++;
     }
-    bfs_eccentrity_with_comp_len(v, component_len);
   }
+
+  int bfs_count = 1;
+  for (int ffo_id = component_len - 1; ffo_id >= 1; ffo_id--) {
+    if (ecc_computed == component_len) {
+      break;
+    }
+    int ffo_v = component_elems[ffo_id];
+
+    if (eccentrities[ffo_v] != 0) {
+      continue;
+    }
+
+    bfs_eccentrity_with_comp_len(ffo_v, component_len);
+    ecc_computed++;
+    bfs_count++;
+
+    for (int j = 0; j < component_len; j++) {
+      int v = component_elems[j];
+
+      if (eccentrities[v] != 0) {
+        dist_start[v] = -1;
+        continue;
+      }
+
+      ecc_low[v] = max(ecc_low[v], dist_start[v]);
+      ecc_upp[v] =
+          min(ecc_upp[v], max(ecc_low[v], dist_ref[ffo_v] + dist_ref[v]));
+
+      if (ecc_low[v] == ecc_upp[v]) {
+        eccentrities[v] = ecc_low[v];
+        ecc_computed++;
+      }
+
+      dist_start[v] = -1;
+    }
+  }
+  // std::cout << "elem count" << component_len << " bfs count" << bfs_count
+  //           << "\n";
 }
 
 void Graph::vertices_eccentricity_and_component_count() {
   for (int i = 0; i < len; i++) {
-    // eccentrity of 0 means the component has not been visited
-    // or the component has only one vertex
-    if (eccentrities[i] != 0) {
+    // pick ref vertex to be the one with highest degree
+    int v = sorted_vertex_arr[len - 1 - i];
+
+    // if (eccentrities[v] != 0) {
+    if (dist_ref[v] != -1) {
       continue;
     }
-    single_comp_eccentrity(i);
+    single_comp_eccentrity(v);
   }
 }
 
@@ -294,8 +354,8 @@ void Graph::check_bipartile() {
 }
 
 void Graph::calculate_properties() {
-  vertices_eccentricity_and_component_count();
   sort_vertex_by_degree_descending();
+  vertices_eccentricity_and_component_count();
   check_bipartile();
   long long max_edges = ((long long)len * (len - 1)) / 2;
   complement_edges = max_edges - edge_count / 2;
