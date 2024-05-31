@@ -10,14 +10,12 @@ struct Queue {
   void resize_clear(int new_cap);
 
   inline void add(int val) {
-    arr[rear] = val;
-    rear++;
+    arr[rear++] = val;
     len++;
   }
 
   inline int remove() {
-    int val = arr[front];
-    front++;
+    int val = arr[front++];
     len--;
     return val;
   }
