@@ -212,6 +212,7 @@ int Graph::bfs_from_ref_and_comp_len(int ref_v) {
       max_dist = next_dist;
     }
   }
+  queue.clear();
   ecc[ref_v] = max_dist;
 
   return component_len;

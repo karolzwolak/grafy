@@ -28,18 +28,12 @@ void Queue::resize_clear(int new_cap) {
 void Queue::add(int val) {
   arr[rear] = val;
   rear++;
-  if (rear == cap) {
-    rear = 0;
-  }
   len++;
 }
 
 int Queue::remove() {
   int val = arr[front];
   front++;
-  if (front == cap) {
-    front = 0;
-  }
   len--;
   return val;
 }
