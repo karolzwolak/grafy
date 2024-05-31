@@ -22,7 +22,7 @@ void VertexAdj::resize_clear(int new_cap) {
 
 Graph::Graph()
     : len(0), cap(0), vertex_adj_arr(nullptr), sorted_vertex_arr(nullptr),
-      is_sorted(false), eccentrities(nullptr), dist_start(nullptr),
+      is_sorted(false), ecc(nullptr), dist_start(nullptr),
       component_elems(nullptr), component_count(0), dist_ref(nullptr),
       ecc_low(nullptr), ecc_upp(nullptr), stack(nullptr),
       bipartile_group(nullptr), is_bipartile(true), edge_count(0),
@@ -48,7 +48,7 @@ void Graph::resize(int new_cap) {
     delete[] vertex_adj_arr;
     delete[] sorted_vertex_arr;
 
-    delete[] eccentrities;
+    delete[] ecc;
     delete[] dist_start;
     delete[] component_elems;
 
@@ -62,7 +62,7 @@ void Graph::resize(int new_cap) {
   }
   sorted_vertex_arr = new int[cap];
 
-  eccentrities = new int[cap];
+  ecc = new int[cap];
   dist_start = new int[cap];
   component_elems = new int[cap];
 
@@ -86,7 +86,7 @@ void Graph::clear() {
   for (int i = 0; i < len; i++) {
     sorted_vertex_arr[i] = i;
 
-    eccentrities[i] = 0;
+    ecc[i] = 0;
 
     dist_ref[i] = -1;
     ecc_low[i] = 0;
@@ -212,12 +212,12 @@ int Graph::bfs_from_ref_and_comp_len(int ref_v) {
       max_dist = next_dist;
     }
   }
-  eccentrities[ref_v] = max_dist;
+  ecc[ref_v] = max_dist;
 
   return component_len;
 }
 
-void Graph::bfs_eccentrity_with_comp_len(int start_v, int comp_len) {
+void Graph::bfs_eccentricity_with_comp_len(int start_v, int comp_len) {
   int max_dist = 0;
   int unique = 1;
 
@@ -241,11 +241,10 @@ void Graph::bfs_eccentrity_with_comp_len(int start_v, int comp_len) {
     }
   }
   queue.clear();
-  eccentrities[start_v] = max_dist;
+  ecc[start_v] = max_dist;
 }
 
-void Graph::single_comp_eccentrity(int ref_v) {
-  // std::cout << "ref " << ref_v << "\n";
+void Graph::single_comp_ifecc(int ref_v) {
   int component_len = bfs_from_ref_and_comp_len(ref_v);
   component_count++;
 
@@ -254,9 +253,8 @@ void Graph::single_comp_eccentrity(int ref_v) {
   for (int i = 1; i < component_len; i++) {
     int v = component_elems[i];
 
-    ecc_low[v] = max(dist_ref[v], eccentrities[ref_v] - dist_ref[v]);
-    ecc_upp[v] = eccentrities[ref_v] + dist_ref[v];
-
+    ecc_low[v] = max(dist_ref[v], ecc[ref_v] - dist_ref[v]);
+    ecc_upp[v] = ecc[ref_v] + dist_ref[v];
   }
 
   for (int ffo_id = component_len - 1; ffo_id >= 1; ffo_id--) {
@@ -265,16 +263,16 @@ void Graph::single_comp_eccentrity(int ref_v) {
     }
     int ffo_v = component_elems[ffo_id];
 
-    if (eccentrities[ffo_v] == 0) {
+    if (ecc[ffo_v] == 0) {
       ecc_computed++;
     }
-    bfs_eccentrity_with_comp_len(ffo_v, component_len);
+    bfs_eccentricity_with_comp_len(ffo_v, component_len);
 
     dist_start[ref_v] = -1;
     for (int j = 1; j < component_len; j++) {
       int v = component_elems[j];
 
-      if (eccentrities[v] != 0) {
+      if (ecc[v] != 0) {
         dist_start[v] = -1;
         continue;
       }
@@ -284,15 +282,13 @@ void Graph::single_comp_eccentrity(int ref_v) {
           min(ecc_upp[v], max(ecc_low[v], dist_ref[ffo_v] + dist_ref[v]));
 
       if (ecc_low[v] == ecc_upp[v]) {
-        eccentrities[v] = ecc_low[v];
+        ecc[v] = ecc_low[v];
         ecc_computed++;
       }
 
       dist_start[v] = -1;
     }
   }
-  // std::cout << "elem count" << component_len << " bfs count" << bfs_count
-  //           << "\n";
 }
 
 void Graph::vertices_eccentricity_and_component_count() {
@@ -300,11 +296,10 @@ void Graph::vertices_eccentricity_and_component_count() {
     // pick ref vertex to be the one with highest degree
     int v = sorted_vertex_arr[len - 1 - i];
 
-    // if (eccentrities[v] != 0) {
-    if (dist_ref[v] != -1) {
+    if (ecc[v] != 0) {
       continue;
     }
-    single_comp_eccentrity(v);
+    single_comp_ifecc(v);
   }
 }
 

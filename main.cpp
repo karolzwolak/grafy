@@ -22,7 +22,7 @@ void print_degree_sequence(Graph &graph) {
 
 void print_ecentricities(Graph &graph) {
   for (int i = 0; i < graph.len; i++) {
-    std::cout << graph.eccentrities[i] << " ";
+    std::cout << graph.ecc[i] << " ";
   }
   std::cout << "\n";
 }
