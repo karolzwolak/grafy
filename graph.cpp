@@ -263,22 +263,19 @@ void Graph::single_comp_eccentrity(int ref_v) {
     }
   }
 
-  int bfs_count = 1;
   for (int ffo_id = component_len - 1; ffo_id >= 1; ffo_id--) {
     if (ecc_computed == component_len) {
       break;
     }
     int ffo_v = component_elems[ffo_id];
 
-    if (eccentrities[ffo_v] != 0) {
-      continue;
+    if (eccentrities[ffo_v] == 0) {
+      ecc_computed++;
     }
-
     bfs_eccentrity_with_comp_len(ffo_v, component_len);
-    ecc_computed++;
-    bfs_count++;
 
-    for (int j = 0; j < component_len; j++) {
+    dist_start[ref_v] = -1;
+    for (int j = 1; j < component_len; j++) {
       int v = component_elems[j];
 
       if (eccentrities[v] != 0) {
