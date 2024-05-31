@@ -269,9 +269,6 @@ void Graph::single_comp_eccentrity(int ref_v) {
     }
     int ffo_v = component_elems[ffo_id];
 
-    if (eccentrities[ffo_v] == 0) {
-      ecc_computed++;
-    }
     bfs_eccentrity_with_comp_len(ffo_v, component_len);
 
     dist_start[ref_v] = -1;
