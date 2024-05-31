@@ -24,16 +24,3 @@ void Queue::resize_clear(int new_cap) {
   resize(new_cap);
   clear();
 }
-
-void Queue::add(int val) {
-  arr[rear] = val;
-  rear++;
-  len++;
-}
-
-int Queue::remove() {
-  int val = arr[front];
-  front++;
-  len--;
-  return val;
-}

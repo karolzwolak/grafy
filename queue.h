@@ -9,6 +9,16 @@ struct Queue {
   void clear();
   void resize_clear(int new_cap);
 
-  void add(int item);
-  int remove();
+  inline void add(int val) {
+    arr[rear] = val;
+    rear++;
+    len++;
+  }
+
+  inline int remove() {
+    int val = arr[front];
+    front++;
+    len--;
+    return val;
+  }
 };
