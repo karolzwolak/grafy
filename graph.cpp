@@ -3,8 +3,8 @@
 #include <climits>
 #include <iostream>
 
-int min(int a, int b) { return a < b ? a : b; }
-int max(int a, int b) { return a > b ? a : b; }
+inline int min(int a, int b) { return a < b ? a : b; }
+inline int max(int a, int b) { return a > b ? a : b; }
 
 VertexAdj::VertexAdj() : len(0), cap(0), adj(nullptr) {}
 
