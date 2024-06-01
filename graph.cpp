@@ -32,9 +32,9 @@ Graph::Graph()
       is_sorted(false), ecc(nullptr), dist_start(nullptr),
       component_elems(nullptr), component_count(0), dist_ref(nullptr),
       ecc_low(nullptr), ecc_upp(nullptr), stack(nullptr),
-      bipartile_group(nullptr), is_bipartile(true), cycle4_count(0),
-      local_count(nullptr), edge_count(0), complement_edges(0), queue(Queue()) {
-}
+      bipartile_group(nullptr), is_bipartile(true), greedy_color(nullptr),
+      cycle4_count(0), local_count(nullptr), edge_count(0), complement_edges(0),
+      queue(Queue()) {}
 
 void Graph::resize(int new_cap) {
   len = new_cap;
@@ -68,6 +68,8 @@ void Graph::resize(int new_cap) {
 
     delete[] bipartile_group;
 
+    delete[] greedy_color;
+
     delete[] local_count;
   }
   sorted_vertex_arr = new int[cap];
@@ -85,6 +87,8 @@ void Graph::resize(int new_cap) {
   bipartile_group = new int[cap];
 
   local_count = new int[cap];
+
+  greedy_color = new int[cap];
 
   vertex_adj_arr = new_vertex_adj_arr;
   bipartile_group = new int[cap];
@@ -109,6 +113,8 @@ void Graph::clear() {
 
     dist_start[i] = -1;
     bipartile_group[i] = -1;
+
+    greedy_color[i] = -1;
 
     local_count[i] = 0;
   }
@@ -411,6 +417,45 @@ void Graph::count_cycle4() {
   }
 }
 
+void Graph::apply_greedy_coloring(int v) {
+  int v_deg = vertex_adj_arr[v].len;
+
+  if (v_deg == 0) {
+    greedy_color[v] = 0;
+    return;
+  }
+
+  bool *available = new bool[v_deg];
+
+  for (int c = 0; c < v_deg; c++) {
+    available[c] = true;
+  }
+
+  for (int i = 0; i < v_deg; i++) {
+    int u = vertex_adj_arr[v].adj[i];
+
+    int color = greedy_color[u];
+    if (color != -1 && color <= v_deg) {
+      available[color] = false;
+    }
+  }
+
+  int min_color = 0;
+  for (; min_color < v_deg; min_color++) {
+    if (available[min_color]) {
+      break;
+    }
+  }
+  greedy_color[v] = min_color;
+
+  delete[] available;
+}
+
+void Graph::apply_all_greedy_colorings() {
+  for (int v = 0; v < len; v++) {
+    apply_greedy_coloring(v);
+  }
+}
 void Graph::calculate_properties() {
   sort_vertex_by_degree_descending();
   sort_all_adj_list_by_degree_descending();
@@ -418,6 +463,8 @@ void Graph::calculate_properties() {
   vertices_eccentricity_and_component_count();
   check_bipartile();
   count_cycle4();
+
+  apply_all_greedy_colorings();
 
   long long max_edges = ((long long)len * (len - 1)) / 2;
   complement_edges = max_edges - edge_count / 2;

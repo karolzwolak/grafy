@@ -27,6 +27,13 @@ void print_ecentricities(Graph &graph) {
   std::cout << "\n";
 }
 
+void print_greedy_colors(Graph &graph) {
+  for (int i = 0; i < graph.len; i++) {
+    std::cout << graph.greedy_color[i] + 1 << " ";
+  }
+  std::cout << "\n";
+}
+
 void solve_graph(Graph &graph) {
   graph.calculate_properties();
   // 1
@@ -46,7 +53,7 @@ void solve_graph(Graph &graph) {
   // 5
   std::cout << "?\n";
   // 6
-  std::cout << "?\n";
+  print_greedy_colors(graph);
   // 7
   std::cout << "?\n";
   // 8
