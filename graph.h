@@ -6,6 +6,8 @@
 int max(int, int);
 int min(int, int);
 
+void swap_vertex(int *, int, int);
+
 struct VertexAdj {
   int len, cap;
   int *adj;
@@ -55,10 +57,18 @@ struct Graph {
   void calculate_properties();
 
   void sort_vertex_by_degree_descending();
-  void quicksort_by_degree(int, int);
-  bool vertex_prior_other(int, int);
-  int partition_by_degree(int, int);
-  void swap_vertex(int, int);
+  void quicksort_by_degree(int *, int, int);
+
+  inline bool vertex_prior_other(int u, int v) {
+    if (u == v) {
+      return true;
+    }
+    int u_deg = vertex_adj_arr[u].len;
+    int v_deg = vertex_adj_arr[v].len;
+
+    return u_deg > v_deg || (u_deg == v_deg && u < v);
+  }
+  int partition_by_degree(int *, int, int);
 
   int bfs_from_ref_and_comp_len(int ref_v);
   void bfs_eccentricity_with_comp_len(int start_v, int comp_len);

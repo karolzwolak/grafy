@@ -6,6 +6,12 @@
 inline int min(int a, int b) { return a < b ? a : b; }
 inline int max(int a, int b) { return a > b ? a : b; }
 
+inline void swap_vertex(int *arr, int i, int j) {
+  int tmp = arr[i];
+  arr[i] = arr[j];
+  arr[j] = tmp;
+}
+
 VertexAdj::VertexAdj() : len(0), cap(0), adj(nullptr) {}
 
 void VertexAdj::resize_clear(int new_cap) {
@@ -135,64 +141,49 @@ void Graph::sort_vertex_by_degree_descending() {
   if (is_sorted) {
     return;
   }
-  quicksort_by_degree(0, len - 1);
+  quicksort_by_degree(sorted_vertex_arr, 0, len - 1);
   is_sorted = true;
 }
-void Graph::quicksort_by_degree(int left, int right) {
+
+void Graph::quicksort_by_degree(int *arr, int left, int right) {
   if (left >= right) {
     return;
   }
-  int pivot = partition_by_degree(left, right);
+  int pivot = partition_by_degree(arr, left, right);
 
-  quicksort_by_degree(left, pivot - 1);
-  quicksort_by_degree(pivot + 1, right);
+  quicksort_by_degree(arr, left, pivot - 1);
+  quicksort_by_degree(arr, pivot + 1, right);
 }
 
-bool Graph::vertex_prior_other(int u, int v) {
-  if (u == v) {
-    return true;
-  }
-  int u_deg = vertex_adj_arr[u].len;
-  int v_deg = vertex_adj_arr[v].len;
-
-  return u_deg > v_deg || (u_deg == v_deg && u < v);
-}
-
-int Graph::partition_by_degree(int left, int right) {
+int Graph::partition_by_degree(int *arr, int left, int right) {
   int mid = (left + right) / 2;
-  if (vertex_prior_other(sorted_vertex_arr[mid], sorted_vertex_arr[left])) {
-    swap_vertex(left, mid);
+  if (vertex_prior_other(arr[mid], arr[left])) {
+    swap_vertex(arr, left, mid);
   }
-  if (vertex_prior_other(sorted_vertex_arr[right], sorted_vertex_arr[left])) {
-    swap_vertex(left, right);
+  if (vertex_prior_other(arr[right], arr[left])) {
+    swap_vertex(arr, left, right);
   }
-  if (vertex_prior_other(sorted_vertex_arr[mid], sorted_vertex_arr[right])) {
-    swap_vertex(mid, right);
+  if (vertex_prior_other(arr[mid], arr[right])) {
+    swap_vertex(arr, mid, right);
   }
   int pivot = right;
 
-  int pivot_v = sorted_vertex_arr[pivot];
+  int pivot_v = arr[pivot];
   int pivot_deg = vertex_adj_arr[pivot_v].len;
 
   int i = left;
 
   for (int j = left; j < right; j++) {
-    int j_v = sorted_vertex_arr[j];
+    int j_v = arr[j];
     int j_deg = vertex_adj_arr[j_v].len;
 
     if (j_deg > pivot_deg || (j_deg == pivot_deg && j_v < pivot_v)) {
-      swap_vertex(i, j);
+      swap_vertex(arr, i, j);
       i++;
     }
   }
-  swap_vertex(i, pivot);
+  swap_vertex(arr, i, pivot);
   return i;
-}
-
-void Graph::swap_vertex(int i, int j) {
-  int tmp = sorted_vertex_arr[i];
-  sorted_vertex_arr[i] = sorted_vertex_arr[j];
-  sorted_vertex_arr[j] = tmp;
 }
 
 int Graph::bfs_from_ref_and_comp_len(int ref_v) {
