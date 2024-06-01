@@ -25,8 +25,9 @@ Graph::Graph()
       is_sorted(false), ecc(nullptr), dist_start(nullptr),
       component_elems(nullptr), component_count(0), dist_ref(nullptr),
       ecc_low(nullptr), ecc_upp(nullptr), stack(nullptr),
-      bipartile_group(nullptr), is_bipartile(true), edge_count(0),
-      complement_edges(0), queue(Queue()) {}
+      bipartile_group(nullptr), is_bipartile(true), cycle4_count(0),
+      local_count(nullptr), edge_count(0), complement_edges(0), queue(Queue()) {
+}
 
 void Graph::resize(int new_cap) {
   len = new_cap;
@@ -59,6 +60,8 @@ void Graph::resize(int new_cap) {
     delete[] stack;
 
     delete[] bipartile_group;
+
+    delete[] local_count;
   }
   sorted_vertex_arr = new int[cap];
 
@@ -74,7 +77,10 @@ void Graph::resize(int new_cap) {
 
   bipartile_group = new int[cap];
 
+  local_count = new int[cap];
+
   vertex_adj_arr = new_vertex_adj_arr;
+  bipartile_group = new int[cap];
 }
 
 void Graph::clear() {
@@ -82,6 +88,8 @@ void Graph::clear() {
   component_count = 0;
   edge_count = 0;
   complement_edges = 0;
+
+  cycle4_count = 0;
 
   for (int i = 0; i < len; i++) {
     sorted_vertex_arr[i] = i;
@@ -94,6 +102,8 @@ void Graph::clear() {
 
     dist_start[i] = -1;
     bipartile_group[i] = -1;
+
+    local_count[i] = 0;
   }
 }
 void Graph::resize_clear(int new_cap) {
@@ -339,6 +349,39 @@ void Graph::check_bipartile() {
       is_bipartile = false;
       break;
     }
+  }
+}
+
+void Graph::count_cycle4_from_v(int start_v) {
+  for (int i = 0; i < vertex_adj_arr[start_v].len; i++) {
+    int u = vertex_adj_arr[start_v].adj[i];
+    if (vertex_adj_arr[u].len > vertex_adj_arr[start_v].len)
+      continue;
+
+    for (int j = 0; j < vertex_adj_arr[u].len; j++) {
+      int y = vertex_adj_arr[u].adj[j];
+      if (vertex_adj_arr[y].len > vertex_adj_arr[start_v].len)
+        continue;
+
+      cycle4_count += local_count[y];
+      local_count[y]++;
+    }
+  }
+  for (int i = 0; i < vertex_adj_arr[start_v].len; i++) {
+    int u = vertex_adj_arr[start_v].adj[i];
+    if (vertex_adj_arr[u].len > vertex_adj_arr[start_v].len)
+      continue;
+
+    for (int j = 0; j < vertex_adj_arr[u].len; j++) {
+      int y = vertex_adj_arr[u].adj[j];
+
+      local_count[y] = 0;
+    }
+  }
+}
+void Graph::count_cycle4() {
+  for (int i = 0; i < len; i++) {
+    count_cycle4_from_v(i);
   }
 }
 

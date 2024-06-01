@@ -52,7 +52,7 @@ void solve_graph(Graph &graph) {
   // 8
   std::cout << "?\n";
   // 9
-  std::cout << "?\n";
+  std::cout << graph.cycle4_count << "\n";
   // 10
   std::cout << graph.complement_edges << "\n";
 }

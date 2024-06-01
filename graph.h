@@ -36,6 +36,9 @@ struct Graph {
   int *bipartile_group;
   bool is_bipartile;
 
+  int cycle4_count;
+  int *local_count;
+
   int edge_count;
   long long complement_edges;
 
@@ -65,4 +68,7 @@ struct Graph {
 
   void single_comp_ifecc(int ref_v);
   void vertices_eccentricity_and_component_count();
+
+  void count_cycle4_from_v(int start_v);
+  void count_cycle4();
 };
