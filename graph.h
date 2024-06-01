@@ -39,6 +39,7 @@ struct Graph {
   bool is_bipartile;
 
   int *greedy_color;
+  int *lf_color;
 
   long long cycle4_count;
   int *local_count;
@@ -87,7 +88,7 @@ struct Graph {
   void single_comp_ifecc(int ref_v);
   void vertices_eccentricity_and_component_count();
 
-  void apply_greedy_coloring(int v);
+  void apply_greedy_coloring(int v, int *color_arr);
   void apply_all_greedy_colorings();
 
   int count_cycle4_from_v(int start_v);

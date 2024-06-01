@@ -33,8 +33,8 @@ Graph::Graph()
       component_elems(nullptr), component_count(0), dist_ref(nullptr),
       ecc_low(nullptr), ecc_upp(nullptr), stack(nullptr),
       bipartile_group(nullptr), is_bipartile(true), greedy_color(nullptr),
-      cycle4_count(0), local_count(nullptr), edge_count(0), complement_edges(0),
-      queue(Queue()) {}
+      lf_color(nullptr), cycle4_count(0), local_count(nullptr), edge_count(0),
+      complement_edges(0), queue(Queue()) {}
 
 void Graph::resize(int new_cap) {
   len = new_cap;
@@ -69,6 +69,7 @@ void Graph::resize(int new_cap) {
     delete[] bipartile_group;
 
     delete[] greedy_color;
+    delete[] lf_color;
 
     delete[] local_count;
   }
@@ -89,6 +90,7 @@ void Graph::resize(int new_cap) {
   local_count = new int[cap];
 
   greedy_color = new int[cap];
+  lf_color = new int[cap];
 
   vertex_adj_arr = new_vertex_adj_arr;
   bipartile_group = new int[cap];
@@ -115,6 +117,7 @@ void Graph::clear() {
     bipartile_group[i] = -1;
 
     greedy_color[i] = -1;
+    lf_color[i] = -1;
 
     local_count[i] = 0;
   }
@@ -417,11 +420,11 @@ void Graph::count_cycle4() {
   }
 }
 
-void Graph::apply_greedy_coloring(int v) {
+void Graph::apply_greedy_coloring(int v, int *color_arr) {
   int v_deg = vertex_adj_arr[v].len;
 
   if (v_deg == 0) {
-    greedy_color[v] = 0;
+    color_arr[v] = 0;
     return;
   }
 
@@ -434,7 +437,7 @@ void Graph::apply_greedy_coloring(int v) {
   for (int i = 0; i < v_deg; i++) {
     int u = vertex_adj_arr[v].adj[i];
 
-    int color = greedy_color[u];
+    int color = color_arr[u];
     if (color != -1 && color <= v_deg) {
       available[color] = false;
     }
@@ -446,14 +449,18 @@ void Graph::apply_greedy_coloring(int v) {
       break;
     }
   }
-  greedy_color[v] = min_color;
+  color_arr[v] = min_color;
 
   delete[] available;
 }
 
 void Graph::apply_all_greedy_colorings() {
   for (int v = 0; v < len; v++) {
-    apply_greedy_coloring(v);
+    apply_greedy_coloring(v, greedy_color);
+  }
+  for (int i = 0; i < len; i++) {
+    int v = sorted_vertex_arr[i];
+    apply_greedy_coloring(v, lf_color);
   }
 }
 void Graph::calculate_properties() {

@@ -34,6 +34,13 @@ void print_greedy_colors(Graph &graph) {
   std::cout << "\n";
 }
 
+void print_lf_colors(Graph &graph) {
+  for (int i = 0; i < graph.len; i++) {
+    std::cout << graph.lf_color[i] + 1 << " ";
+  }
+  std::cout << "\n";
+}
+
 void solve_graph(Graph &graph) {
   graph.calculate_properties();
   // 1
@@ -55,7 +62,7 @@ void solve_graph(Graph &graph) {
   // 6
   print_greedy_colors(graph);
   // 7
-  std::cout << "?\n";
+  print_lf_colors(graph);
   // 8
   std::cout << "?\n";
   // 9
