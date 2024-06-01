@@ -148,12 +148,10 @@ void Graph::quicksort_by_degree(int left, int right) {
   quicksort_by_degree(pivot + 1, right);
 }
 
-bool Graph::vertex_prior_other(int u_i, int v_i) {
-  if (u_i == v_i) {
+bool Graph::vertex_prior_other(int u, int v) {
+  if (u == v) {
     return true;
   }
-  int u = sorted_vertex_arr[u_i];
-  int v = sorted_vertex_arr[v_i];
   int u_deg = vertex_adj_arr[u].len;
   int v_deg = vertex_adj_arr[v].len;
 
@@ -162,13 +160,13 @@ bool Graph::vertex_prior_other(int u_i, int v_i) {
 
 int Graph::partition_by_degree(int left, int right) {
   int mid = (left + right) / 2;
-  if (vertex_prior_other(mid, left)) {
+  if (vertex_prior_other(sorted_vertex_arr[mid], sorted_vertex_arr[left])) {
     swap_vertex(left, mid);
   }
-  if (vertex_prior_other(right, left)) {
+  if (vertex_prior_other(sorted_vertex_arr[right], sorted_vertex_arr[left])) {
     swap_vertex(left, right);
   }
-  if (vertex_prior_other(mid, right)) {
+  if (vertex_prior_other(sorted_vertex_arr[mid], sorted_vertex_arr[right])) {
     swap_vertex(mid, right);
   }
   int pivot = right;
@@ -355,12 +353,12 @@ void Graph::check_bipartile() {
 void Graph::count_cycle4_from_v(int start_v) {
   for (int i = 0; i < vertex_adj_arr[start_v].len; i++) {
     int u = vertex_adj_arr[start_v].adj[i];
-    if (vertex_adj_arr[u].len > vertex_adj_arr[start_v].len)
+    if (vertex_prior_other(u, start_v))
       continue;
 
     for (int j = 0; j < vertex_adj_arr[u].len; j++) {
       int y = vertex_adj_arr[u].adj[j];
-      if (vertex_adj_arr[y].len > vertex_adj_arr[start_v].len)
+      if (vertex_prior_other(y, start_v))
         continue;
 
       cycle4_count += local_count[y];
@@ -369,7 +367,7 @@ void Graph::count_cycle4_from_v(int start_v) {
   }
   for (int i = 0; i < vertex_adj_arr[start_v].len; i++) {
     int u = vertex_adj_arr[start_v].adj[i];
-    if (vertex_adj_arr[u].len > vertex_adj_arr[start_v].len)
+    if (vertex_prior_other(u, start_v))
       continue;
 
     for (int j = 0; j < vertex_adj_arr[u].len; j++) {
@@ -389,6 +387,8 @@ void Graph::calculate_properties() {
   sort_vertex_by_degree_descending();
   vertices_eccentricity_and_component_count();
   check_bipartile();
+  count_cycle4();
+
   long long max_edges = ((long long)len * (len - 1)) / 2;
   complement_edges = max_edges - edge_count / 2;
 }
