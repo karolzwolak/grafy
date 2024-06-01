@@ -217,6 +217,16 @@ int Graph::bfs_from_ref_and_comp_len(int ref_v) {
   return component_len;
 }
 
+void Graph::sort_all_adj_list_by_degree_descending() {
+  for (int i = 0; i < len; i++) {
+    sort_adj_by_degree_descending(i);
+  }
+}
+
+void Graph::sort_adj_by_degree_descending(int v) {
+  quicksort_by_degree(vertex_adj_arr[v].adj, 0, vertex_adj_arr[v].len - 1);
+}
+
 void Graph::bfs_eccentricity_with_comp_len(int start_v, int comp_len) {
   int max_dist = 0;
   int unique = 1;
@@ -376,6 +386,8 @@ void Graph::count_cycle4() {
 
 void Graph::calculate_properties() {
   sort_vertex_by_degree_descending();
+  sort_all_adj_list_by_degree_descending();
+
   vertices_eccentricity_and_component_count();
   check_bipartile();
   count_cycle4();

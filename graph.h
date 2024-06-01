@@ -57,6 +57,10 @@ struct Graph {
   void calculate_properties();
 
   void sort_vertex_by_degree_descending();
+
+  void sort_all_adj_list_by_degree_descending();
+  void sort_adj_by_degree_descending(int);
+
   void quicksort_by_degree(int *, int, int);
 
   inline bool vertex_prior_other(int u, int v) {
