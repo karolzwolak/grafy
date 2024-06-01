@@ -5,8 +5,8 @@ void print_graph(const Graph &graph) {
   std::cout << "Graph:\n";
   for (int i = 0; i < graph.len; i++) {
     std::cout << i << ": ";
-    for (int j = 0; j < graph.vertex_adj_arr[i].len; j++) {
-      std::cout << graph.vertex_adj_arr[i].adj[j] << " ";
+    for (int j = 0; j < graph.len_arr[i]; j++) {
+      std::cout << graph.adj[i][j] << " ";
     }
     std::cout << "\n";
   }
@@ -15,7 +15,7 @@ void print_graph(const Graph &graph) {
 void print_degree_sequence(Graph &graph) {
   for (int i = graph.len - 1; i >= 0; i--) {
     int vertex = graph.sorted_vertex_arr[i];
-    std::cout << graph.vertex_adj_arr[vertex].len << " ";
+    std::cout << graph.len_arr[vertex] << " ";
   }
   std::cout << "\n";
 }

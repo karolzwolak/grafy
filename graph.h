@@ -6,18 +6,13 @@
 int max(int, int);
 int min(int, int);
 
-struct VertexAdj {
-  int len, cap;
-  int *adj;
-
-  VertexAdj();
-
-  void resize_clear(int);
-};
-
 struct Graph {
   int len, cap;
-  VertexAdj *vertex_adj_arr;
+
+  int *deg_arr;
+  int *cap_arr;
+  int **adj;
+
   // the sorted vertex array by degree
   int *sorted_vertex_arr;
   bool is_sorted;
@@ -42,6 +37,8 @@ struct Graph {
   Queue queue;
 
   Graph();
+
+  void adj_resize_clear(int, int);
 
   void parse_from_stdin();
   void resize_clear(int);

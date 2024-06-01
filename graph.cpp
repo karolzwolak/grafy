@@ -6,25 +6,23 @@
 inline int min(int a, int b) { return a < b ? a : b; }
 inline int max(int a, int b) { return a > b ? a : b; }
 
-VertexAdj::VertexAdj() : len(0), cap(0), adj(nullptr) {}
-
-void VertexAdj::resize_clear(int new_cap) {
-  len = new_cap;
-  if (new_cap <= cap) {
+void Graph::adj_resize_clear(int id, int new_cap) {
+  deg_arr[id] = new_cap;
+  if (new_cap <= cap_arr[id]) {
     return;
   }
-  cap = new_cap;
-  if (adj != nullptr) {
-    delete[] adj;
+  cap_arr[id] = new_cap;
+  if (adj[id] != nullptr) {
+    delete[] adj[id];
   }
-  adj = new int[cap];
+  adj[id] = new int[cap];
 }
 
 Graph::Graph()
-    : len(0), cap(0), vertex_adj_arr(nullptr), sorted_vertex_arr(nullptr),
-      is_sorted(false), ecc(nullptr), dist_start(nullptr),
-      component_elems(nullptr), component_count(0), dist_ref(nullptr),
-      ecc_low(nullptr), ecc_upp(nullptr), stack(nullptr),
+    : len(0), cap(0), deg_arr(nullptr), cap_arr(nullptr), adj(nullptr),
+      sorted_vertex_arr(nullptr), is_sorted(false), ecc(nullptr),
+      dist_start(nullptr), component_elems(nullptr), component_count(0),
+      dist_ref(nullptr), ecc_low(nullptr), ecc_upp(nullptr), stack(nullptr),
       bipartile_group(nullptr), is_bipartile(true), edge_count(0),
       complement_edges(0), queue(Queue()) {}
 
@@ -36,16 +34,26 @@ void Graph::resize(int new_cap) {
   }
   int old_cap = cap;
   cap = new_cap;
-  VertexAdj *new_vertex_adj_arr = new VertexAdj[cap];
+  int **new_adj = new int *[cap];
 
-  if (vertex_adj_arr != nullptr) {
+  int *new_caps = new int[cap];
+  int *new_deg = new int[cap];
+
+  if (adj != nullptr) {
     for (int i = 0; i < old_cap; i++) {
-      new_vertex_adj_arr[i] = vertex_adj_arr[i];
+      new_adj[i] = adj[i];
+      new_caps[i] = cap_arr[i];
+      new_deg[i] = deg_arr[i];
     }
     for (int i = old_cap; i < cap; i++) {
-      new_vertex_adj_arr[i] = VertexAdj();
+      new_adj[i] = nullptr;
+      new_caps[i] = 0;
+      new_deg[i] = 0;
     }
-    delete[] vertex_adj_arr;
+    delete[] adj;
+    delete[] deg_arr;
+    delete[] cap_arr;
+
     delete[] sorted_vertex_arr;
 
     delete[] ecc;
@@ -74,7 +82,9 @@ void Graph::resize(int new_cap) {
 
   bipartile_group = new int[cap];
 
-  vertex_adj_arr = new_vertex_adj_arr;
+  adj = new_adj;
+  cap_arr = new_caps;
+  deg_arr = new_deg;
 }
 
 void Graph::clear() {
@@ -111,12 +121,12 @@ void Graph::parse_from_stdin() {
     std::cin >> edge_len;
 
     edge_count += edge_len;
-    vertex_adj_arr[i].resize_clear(edge_len);
+    adj_resize_clear(i, edge_len);
 
     for (int j = 0; j < edge_len; j++) {
       int edge_to;
       std::cin >> edge_to;
-      vertex_adj_arr[i].adj[j] = edge_to - 1;
+      adj[i][j] = edge_to - 1;
     }
   }
 }
@@ -144,8 +154,8 @@ bool Graph::vertex_prior_other(int u_i, int v_i) {
   }
   int u = sorted_vertex_arr[u_i];
   int v = sorted_vertex_arr[v_i];
-  int u_deg = vertex_adj_arr[u].len;
-  int v_deg = vertex_adj_arr[v].len;
+  int u_deg = deg_arr[u];
+  int v_deg = deg_arr[v];
 
   return u_deg < v_deg || (u_deg == v_deg && u < v);
 }
@@ -164,13 +174,13 @@ int Graph::partition_by_degree(int left, int right) {
   int pivot = right;
 
   int pivot_v = sorted_vertex_arr[pivot];
-  int pivot_deg = vertex_adj_arr[pivot_v].len;
+  int pivot_deg = deg_arr[pivot_v];
 
   int i = left;
 
   for (int j = left; j < right; j++) {
     int j_v = sorted_vertex_arr[j];
-    int j_deg = vertex_adj_arr[j_v].len;
+    int j_deg = deg_arr[j_v];
 
     if (j_deg < pivot_deg || (j_deg == pivot_deg && j_v < pivot_v)) {
       swap_vertex(i, j);
@@ -200,8 +210,9 @@ int Graph::bfs_from_ref_and_comp_len(int ref_v) {
     int v = queue.remove();
 
     int next_dist = dist_ref[v] + 1;
-    for (int i = 0; i < vertex_adj_arr[v].len; i++) {
-      int u = vertex_adj_arr[v].adj[i];
+    for (int i = 0; i < deg_arr[v]; i++) {
+      int u = adj[v][i];
+
       if (dist_ref[u] != -1) {
         continue;
       }
@@ -229,8 +240,8 @@ void Graph::bfs_eccentricity_with_comp_len(int start_v, int comp_len) {
     int v = queue.remove();
 
     int next_dist = dist_start[v] + 1;
-    for (int i = 0; i < vertex_adj_arr[v].len; i++) {
-      int u = vertex_adj_arr[v].adj[i];
+    for (int i = 0; i < deg_arr[v]; i++) {
+      int u = adj[v][i];
       if (dist_start[u] != -1) {
         continue;
       }
@@ -315,8 +326,8 @@ bool Graph::dfs_check_bipartite(int start_v) {
 
     int color = 1 - bipartile_group[v];
 
-    for (int i = 0; i < vertex_adj_arr[v].len; i++) {
-      int u = vertex_adj_arr[v].adj[i];
+    for (int i = 0; i < deg_arr[v]; i++) {
+      int u = adj[v][i];
 
       if (bipartile_group[u] == -1) {
         stack[stack_len++] = u;
