@@ -146,47 +146,6 @@ void Graph::sort_vertex_by_degree_descending() {
   is_sorted = true;
 }
 
-void Graph::quicksort_by_degree(int *arr, int left, int right) {
-  if (left >= right) {
-    return;
-  }
-  int pivot = partition_by_degree(arr, left, right);
-
-  quicksort_by_degree(arr, left, pivot - 1);
-  quicksort_by_degree(arr, pivot + 1, right);
-}
-
-int Graph::partition_by_degree(int *arr, int left, int right) {
-  int mid = (left + right) / 2;
-  if (vertex_prior_other(arr[mid], arr[left])) {
-    swap_vertex(arr, left, mid);
-  }
-  if (vertex_prior_other(arr[right], arr[left])) {
-    swap_vertex(arr, left, right);
-  }
-  if (vertex_prior_other(arr[mid], arr[right])) {
-    swap_vertex(arr, mid, right);
-  }
-  int pivot = right;
-
-  int pivot_v = arr[pivot];
-  int pivot_deg = vertex_adj_arr[pivot_v].len;
-
-  int i = left;
-
-  for (int j = left; j < right; j++) {
-    int j_v = arr[j];
-    int j_deg = vertex_adj_arr[j_v].len;
-
-    if (j_deg > pivot_deg || (j_deg == pivot_deg && j_v < pivot_v)) {
-      swap_vertex(arr, i, j);
-      i++;
-    }
-  }
-  swap_vertex(arr, i, pivot);
-  return i;
-}
-
 int Graph::bfs_from_ref_and_comp_len(int ref_v) {
   int max_dist = 0;
 

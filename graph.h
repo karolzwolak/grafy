@@ -63,7 +63,46 @@ struct Graph {
   void move_smaller_adj_degrees_to_end(int);
   void sort_adj_by_degree_descending(int);
 
-  void quicksort_by_degree(int *, int, int);
+  inline void quicksort_by_degree(int *arr, int left, int right) {
+    if (left >= right) {
+      return;
+    }
+    int pivot = partition_by_degree(arr, left, right);
+
+    quicksort_by_degree(arr, left, pivot - 1);
+    quicksort_by_degree(arr, pivot + 1, right);
+  }
+
+  inline int partition_by_degree(int *arr, int left, int right) {
+    int mid = (left + right) / 2;
+    if (vertex_prior_other(arr[mid], arr[left])) {
+      swap_vertex(arr, left, mid);
+    }
+    if (vertex_prior_other(arr[right], arr[left])) {
+      swap_vertex(arr, left, right);
+    }
+    if (vertex_prior_other(arr[mid], arr[right])) {
+      swap_vertex(arr, mid, right);
+    }
+    int pivot = right;
+
+    int pivot_v = arr[pivot];
+    int pivot_deg = vertex_adj_arr[pivot_v].len;
+
+    int i = left;
+
+    for (int j = left; j < right; j++) {
+      int j_v = arr[j];
+      int j_deg = vertex_adj_arr[j_v].len;
+
+      if (j_deg > pivot_deg || (j_deg == pivot_deg && j_v < pivot_v)) {
+        swap_vertex(arr, i, j);
+        i++;
+      }
+    }
+    swap_vertex(arr, i, pivot);
+    return i;
+  }
 
   inline bool vertex_prior_other(int u, int v) {
     if (u == v) {
@@ -74,7 +113,6 @@ struct Graph {
 
     return u_deg > v_deg || (u_deg == v_deg && u < v);
   }
-  int partition_by_degree(int *, int, int);
 
   int bfs_from_ref_and_comp_len(int ref_v);
   void bfs_eccentricity_with_comp_len(int start_v, int comp_len);
