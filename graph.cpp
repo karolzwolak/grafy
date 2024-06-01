@@ -352,26 +352,20 @@ void Graph::check_bipartile() {
 }
 
 void Graph::count_cycle4_from_v(int start_v) {
-  for (int i = 0; i < vertex_adj_arr[start_v].len; i++) {
+  for (int i = vertex_adj_arr[start_v].len - 1; i >= 0; i--) {
     int u = vertex_adj_arr[start_v].adj[i];
-    if (vertex_prior_other(u, start_v))
-      continue;
 
-    for (int j = 0; j < vertex_adj_arr[u].len; j++) {
+    for (int j = vertex_adj_arr[u].len - 1; j > i; j--) {
       int y = vertex_adj_arr[u].adj[j];
-      if (vertex_prior_other(y, start_v))
-        continue;
 
       cycle4_count += local_count[y];
       local_count[y]++;
     }
   }
-  for (int i = 0; i < vertex_adj_arr[start_v].len; i++) {
+  for (int i = vertex_adj_arr[start_v].len - 1; i >= 0; i--) {
     int u = vertex_adj_arr[start_v].adj[i];
-    if (vertex_prior_other(u, start_v))
-      continue;
 
-    for (int j = 0; j < vertex_adj_arr[u].len; j++) {
+    for (int j = vertex_adj_arr[u].len - 1; j > i; j--) {
       int y = vertex_adj_arr[u].adj[j];
 
       local_count[y] = 0;
