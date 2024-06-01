@@ -12,10 +12,11 @@ inline void swap_vertex(int *arr, int i, int j) {
   arr[j] = tmp;
 }
 
-VertexAdj::VertexAdj() : len(0), cap(0), adj(nullptr) {}
+VertexAdj::VertexAdj() : len(0), cap(0), last_smaller_id(0), adj(nullptr) {}
 
 void VertexAdj::resize_clear(int new_cap) {
   len = new_cap;
+  last_smaller_id = 0;
   if (new_cap <= cap) {
     return;
   }
@@ -223,8 +224,32 @@ void Graph::sort_all_adj_list_by_degree_descending() {
   }
 }
 
+void Graph::move_smaller_adj_degrees_to_end(int v) {
+  int *arr = vertex_adj_arr[v].adj;
+
+  int pivot_v = v;
+  int pivot_deg = vertex_adj_arr[pivot_v].len;
+
+  int i = 0;
+
+  for (int j = 0; j < vertex_adj_arr[v].len; j++) {
+    int j_v = arr[j];
+    int j_deg = vertex_adj_arr[j_v].len;
+
+    if (j_deg > pivot_deg || (j_deg == pivot_deg && j_v < pivot_v)) {
+      swap_vertex(arr, i, j);
+      i++;
+    }
+  }
+
+  vertex_adj_arr[v].last_smaller_id = i;
+}
+
 void Graph::sort_adj_by_degree_descending(int v) {
-  quicksort_by_degree(vertex_adj_arr[v].adj, 0, vertex_adj_arr[v].len - 1);
+  move_smaller_adj_degrees_to_end(v);
+
+  int *arr = vertex_adj_arr[v].adj;
+  quicksort_by_degree(arr, 0, vertex_adj_arr[v].last_smaller_id - 1);
 }
 
 void Graph::bfs_eccentricity_with_comp_len(int start_v, int comp_len) {
@@ -352,7 +377,8 @@ void Graph::check_bipartile() {
 }
 
 void Graph::count_cycle4_from_v(int start_v) {
-  for (int i = vertex_adj_arr[start_v].len - 1; i >= 0; i--) {
+  for (int i = vertex_adj_arr[start_v].len - 1;
+       i >= vertex_adj_arr[start_v].last_smaller_id; i--) {
     int u = vertex_adj_arr[start_v].adj[i];
 
     for (int j = vertex_adj_arr[u].len - 1; j > i; j--) {
@@ -362,7 +388,8 @@ void Graph::count_cycle4_from_v(int start_v) {
       local_count[y]++;
     }
   }
-  for (int i = vertex_adj_arr[start_v].len - 1; i >= 0; i--) {
+  for (int i = vertex_adj_arr[start_v].len - 1;
+       i >= vertex_adj_arr[start_v].last_smaller_id; i--) {
     int u = vertex_adj_arr[start_v].adj[i];
 
     for (int j = vertex_adj_arr[u].len - 1; j > i; j--) {

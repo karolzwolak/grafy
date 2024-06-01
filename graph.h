@@ -9,7 +9,7 @@ int min(int, int);
 void swap_vertex(int *, int, int);
 
 struct VertexAdj {
-  int len, cap;
+  int len, cap, last_smaller_id;
   int *adj;
 
   VertexAdj();
@@ -59,6 +59,8 @@ struct Graph {
   void sort_vertex_by_degree_descending();
 
   void sort_all_adj_list_by_degree_descending();
+
+  void move_smaller_adj_degrees_to_end(int);
   void sort_adj_by_degree_descending(int);
 
   void quicksort_by_degree(int *, int, int);
