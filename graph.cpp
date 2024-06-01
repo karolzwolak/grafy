@@ -376,15 +376,18 @@ void Graph::check_bipartile() {
   }
 }
 
-void Graph::count_cycle4_from_v(int start_v) {
+int Graph::count_cycle4_from_v(int start_v) {
+  int count = 0;
   for (int i = vertex_adj_arr[start_v].len - 1;
        i >= vertex_adj_arr[start_v].last_smaller_id; i--) {
     int u = vertex_adj_arr[start_v].adj[i];
 
-    for (int j = vertex_adj_arr[u].len - 1; j > i; j--) {
+    for (int j = vertex_adj_arr[u].len - 1; j >= 0; j--) {
       int y = vertex_adj_arr[u].adj[j];
+      if (y == start_v)
+        break;
 
-      cycle4_count += local_count[y];
+      count += local_count[y];
       local_count[y]++;
     }
   }
@@ -392,16 +395,19 @@ void Graph::count_cycle4_from_v(int start_v) {
        i >= vertex_adj_arr[start_v].last_smaller_id; i--) {
     int u = vertex_adj_arr[start_v].adj[i];
 
-    for (int j = vertex_adj_arr[u].len - 1; j > i; j--) {
+    for (int j = vertex_adj_arr[u].len - 1; j >= 0; j--) {
       int y = vertex_adj_arr[u].adj[j];
+      if (y == start_v)
+        break;
 
       local_count[y] = 0;
     }
   }
+  return count;
 }
 void Graph::count_cycle4() {
   for (int i = 0; i < len; i++) {
-    count_cycle4_from_v(i);
+    cycle4_count += count_cycle4_from_v(i);
   }
 }
 
