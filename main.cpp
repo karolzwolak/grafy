@@ -13,7 +13,7 @@ void print_graph(const Graph &graph) {
 }
 
 void print_degree_sequence(Graph &graph) {
-  for (int i = graph.len - 1; i >= 0; i--) {
+  for (int i = 0; i < graph.len; i++) {
     int vertex = graph.sorted_vertex_arr[i];
     std::cout << graph.vertex_adj_arr[vertex].len << " ";
   }

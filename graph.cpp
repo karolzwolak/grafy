@@ -155,7 +155,7 @@ bool Graph::vertex_prior_other(int u, int v) {
   int u_deg = vertex_adj_arr[u].len;
   int v_deg = vertex_adj_arr[v].len;
 
-  return u_deg < v_deg || (u_deg == v_deg && u < v);
+  return u_deg > v_deg || (u_deg == v_deg && u < v);
 }
 
 int Graph::partition_by_degree(int left, int right) {
@@ -180,7 +180,7 @@ int Graph::partition_by_degree(int left, int right) {
     int j_v = sorted_vertex_arr[j];
     int j_deg = vertex_adj_arr[j_v].len;
 
-    if (j_deg < pivot_deg || (j_deg == pivot_deg && j_v < pivot_v)) {
+    if (j_deg > pivot_deg || (j_deg == pivot_deg && j_v < pivot_v)) {
       swap_vertex(i, j);
       i++;
     }
@@ -303,7 +303,7 @@ void Graph::single_comp_ifecc(int ref_v) {
 void Graph::vertices_eccentricity_and_component_count() {
   for (int i = 0; i < len; i++) {
     // pick ref vertex to be the one with highest degree
-    int v = sorted_vertex_arr[len - 1 - i];
+    int v = sorted_vertex_arr[i];
 
     if (ecc[v] != 0) {
       continue;
